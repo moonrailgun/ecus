@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  app:
     dependencies:
       '@auth/drizzle-adapter':
         specifier: ^1.7.2
