@@ -5,6 +5,8 @@ import {
   type PutObjectCommandInput,
   type PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
+import mime from "mime";
+import path from "path";
 
 const s3Client = new S3Client({
   endpoint: env.S3_ENDPOINT,
@@ -17,17 +19,16 @@ const s3Client = new S3Client({
 
 export async function uploadFile(
   key: string,
-  file: File,
+  buffer: Buffer,
 ): Promise<PutObjectCommandOutput> {
   try {
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const mimeType = mime.getType(path.extname(key));
 
     const uploadParams = {
       Bucket: env.S3_BUCKET_NAME,
       Key: key, // 文件存储在 S3 上的路径
       Body: buffer,
-      ContentType: file.type,
+      ContentType: mimeType ?? undefined,
     } satisfies PutObjectCommandInput;
 
     const command = new PutObjectCommand(uploadParams);

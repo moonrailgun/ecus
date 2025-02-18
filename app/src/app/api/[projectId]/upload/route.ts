@@ -1,6 +1,8 @@
-import { uploadFile } from "@/server/s3/client";
+import { uploadFile } from "@/server/file/client";
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
+import { processZipFile } from "@/server/file/utils";
+import fs from "fs/promises";
 
 export async function PUT(
   request: NextRequest,
@@ -26,6 +28,17 @@ export async function PUT(
     const file = formData.get("file") as File;
     const name = (formData.get("name") as string) ?? file.name;
 
+    if (!file) {
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    }
+
+    if (file.type !== "application/zip") {
+      return NextResponse.json(
+        { error: "Need to upload zip file" },
+        { status: 400 },
+      );
+    }
+
     if (!name) {
       return NextResponse.json(
         { error: "No file name provide" },
@@ -33,17 +46,18 @@ export async function PUT(
       );
     }
 
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    const filelist = await processZipFile(file);
+
+    const dir = `iexpo/${projectId}/updates/${Date.now()}`;
+    for (const f of filelist) {
+      const key = `${dir}/${f.name}`;
+      const file = await fs.readFile(f.path);
+
+      await uploadFile(key, file);
     }
 
-    const key = `iexpo/${projectId}/updates/${Date.now()}/${name}`;
-    const res = await uploadFile(key, file);
-
     return NextResponse.json({
-      message: "File uploaded successfully",
-      key,
-      etag: res.ETag,
+      filelist,
     });
   } catch (err) {
     return NextResponse.json(
