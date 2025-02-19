@@ -1,0 +1,74 @@
+import React from "react";
+import {
+  Button,
+  Card,
+  Form,
+  Message,
+  Upload,
+  useEvent,
+  useNavigate,
+} from "tushan";
+import { useAdminStore } from "../useAdminStore";
+import { get } from "lodash-es";
+
+const FormItem = Form.Item;
+
+export const DeploymentCreate: React.FC = React.memo(() => {
+  const projectId = useAdminStore((state) => state.projectId);
+  const navigate = useNavigate();
+  const handleSubmit = useEvent(async (args: unknown) => {
+    const file = get(args, ["bundle", 0, "originFile"]);
+
+    if (!(file instanceof File)) {
+      Message.warning("Please upload file");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`/api/${projectId}/upload`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      Message.error(JSON.stringify(json));
+      throw new Error(JSON.stringify(json));
+    }
+
+    // TODO
+    console.log(json);
+
+    Message.success("Upload success");
+
+    debugger;
+
+    navigate("/deployment");
+  });
+
+  return (
+    <Card>
+      <Form style={{ width: 600 }} autoComplete="off" onSubmit={handleSubmit}>
+        <FormItem label="Bundle" field="bundle" triggerPropName="fileList">
+          <Upload
+            drag
+            multiple
+            directory={false}
+            autoUpload={false}
+            limit={1}
+            accept="application/zip"
+            tip="Only zip bundle can be uploaded"
+          />
+        </FormItem>
+        <FormItem wrapperCol={{ offset: 5 }}>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </FormItem>
+      </Form>
+    </Card>
+  );
+});
+DeploymentCreate.displayName = "DeploymentCreate";

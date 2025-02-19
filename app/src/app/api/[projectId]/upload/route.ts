@@ -48,6 +48,20 @@ export async function PUT(
 
     const filelist = await processZipFile(file);
 
+    if (!filelist.some((f) => f.name.includes("metadata.json"))) {
+      return NextResponse.json(
+        { error: "Its not a react native bundle" },
+        { status: 400 },
+      );
+    }
+
+    if (!filelist.some((f) => f.name.includes("expoConfig.json"))) {
+      return NextResponse.json(
+        { error: "Its not a expo bundle" },
+        { status: 400 },
+      );
+    }
+
     const dir = `iexpo/${projectId}/updates/${Date.now()}`;
     for (const f of filelist) {
       const key = `${dir}/${f.name}`;

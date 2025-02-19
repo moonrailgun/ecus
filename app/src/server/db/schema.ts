@@ -9,6 +9,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
+import { createId as createCuid } from "@paralleldrive/cuid2";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -22,7 +23,7 @@ export const posts = createTable(
   "post",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
+    name: varchar("name", { length: 255 }),
     createdById: varchar("created_by", { length: 255 })
       .notNull()
       .references(() => users.id),
@@ -43,7 +44,7 @@ export const users = createTable("user", {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => createCuid()),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("email_verified", {
@@ -129,7 +130,9 @@ export const verificationTokens = createTable(
 );
 
 export const project = createTable("project", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .$defaultFn(() => createCuid()),
   name: varchar("name", { length: 255 }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
@@ -138,3 +141,60 @@ export const project = createTable("project", {
     () => new Date(),
   ),
 });
+
+export const projectRelations = relations(project, ({ many }) => ({
+  deployment: many(deployment),
+}));
+
+export const branch = createTable("branch", {
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .$defaultFn(() => createCuid()),
+  projectId: varchar("project_id", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const branchRelations = relations(branch, ({ one, many }) => ({
+  project: one(project, {
+    fields: [branch.projectId],
+    references: [project.id],
+  }),
+  deployment: many(deployment),
+}));
+
+export const deployment = createTable("deployment", {
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .$defaultFn(() => createCuid()),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  projectId: varchar("project_id", { length: 255 }).notNull(),
+  branchId: varchar("branch_id", { length: 255 }),
+  runtimeVersion: varchar("runtime_version", { length: 255 }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const deploymentRelations = relations(deployment, ({ one }) => ({
+  author: one(users, {
+    fields: [deployment.userId],
+    references: [users.id],
+  }),
+  project: one(project, {
+    fields: [deployment.projectId],
+    references: [project.id],
+  }),
+  branch: one(branch, {
+    fields: [deployment.branchId],
+    references: [branch.id],
+  }),
+}));
