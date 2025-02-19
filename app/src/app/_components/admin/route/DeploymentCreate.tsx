@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Card,
   Form,
   Message,
   Upload,
-  useEvent,
+  useEventWithLoading,
   useNavigate,
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
@@ -16,37 +16,34 @@ const FormItem = Form.Item;
 export const DeploymentCreate: React.FC = React.memo(() => {
   const projectId = useAdminStore((state) => state.projectId);
   const navigate = useNavigate();
-  const handleSubmit = useEvent(async (args: unknown) => {
-    const file = get(args, ["bundle", 0, "originFile"]);
+  const [handleSubmit, isLoading] = useEventWithLoading(
+    async (args: unknown) => {
+      const file = get(args, ["bundle", 0, "originFile"]);
 
-    if (!(file instanceof File)) {
-      Message.warning("Please upload file");
-      return;
-    }
+      if (!(file instanceof File)) {
+        Message.warning("Please upload file");
+        return;
+      }
 
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch(`/api/${projectId}/upload`, {
-      method: "PUT",
-      body: formData,
-    });
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/${projectId}/upload`, {
+        method: "PUT",
+        body: formData,
+      });
 
-    const json = await res.json();
+      const json = await res.json();
 
-    if (!res.ok) {
-      Message.error(JSON.stringify(json));
-      throw new Error(JSON.stringify(json));
-    }
+      if (!res.ok) {
+        Message.error(JSON.stringify(json));
+        throw new Error(JSON.stringify(json));
+      }
 
-    // TODO
-    console.log(json);
+      Message.success("Upload success");
 
-    Message.success("Upload success");
-
-    debugger;
-
-    navigate("/deployment");
-  });
+      navigate("/deployment");
+    },
+  );
 
   return (
     <Card>
@@ -55,6 +52,7 @@ export const DeploymentCreate: React.FC = React.memo(() => {
           <Upload
             drag
             multiple
+            disabled={isLoading}
             directory={false}
             autoUpload={false}
             limit={1}
@@ -63,7 +61,7 @@ export const DeploymentCreate: React.FC = React.memo(() => {
           />
         </FormItem>
         <FormItem wrapperCol={{ offset: 5 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={isLoading}>
             Submit
           </Button>
         </FormItem>

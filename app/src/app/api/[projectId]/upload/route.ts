@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { processZipFile } from "@/server/file/utils";
 import fs from "fs/promises";
+import { createDeploymentWithFileList } from "@/server/api/deployment";
 
 export async function PUT(
   request: NextRequest,
@@ -48,30 +49,43 @@ export async function PUT(
 
     const filelist = await processZipFile(file);
 
-    if (!filelist.some((f) => f.name.includes("metadata.json"))) {
+    if (!filelist.some((f) => f.name === "metadata.json")) {
       return NextResponse.json(
         { error: "Its not a react native bundle" },
         { status: 400 },
       );
     }
 
-    if (!filelist.some((f) => f.name.includes("expoConfig.json"))) {
+    if (!filelist.some((f) => f.name === "expoConfig.json")) {
       return NextResponse.json(
         { error: "Its not a expo bundle" },
         { status: 400 },
       );
     }
 
-    const dir = `iexpo/${projectId}/updates/${Date.now()}`;
-    for (const f of filelist) {
-      const key = `${dir}/${f.name}`;
-      const file = await fs.readFile(f.path);
+    const id = await createDeploymentWithFileList(
+      projectId,
+      session.user.id,
+      filelist,
+    );
 
-      await uploadFile(key, file);
-    }
+    const dir = `iexpo/${projectId}/updates/${id}`;
+
+    await Promise.all(
+      filelist.map(async (f) => {
+        const key = `${dir}/${f.name}`;
+        const file = await fs.readFile(f.path);
+
+        await uploadFile(key, file);
+      }),
+    );
 
     return NextResponse.json({
-      filelist,
+      id,
+      filelist: filelist.map((f) => ({
+        name: f.name,
+        key: `${dir}/${f.name}`,
+      })),
     });
   } catch (err) {
     return NextResponse.json(

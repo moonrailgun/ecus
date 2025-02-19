@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { jsonServerProvider, Resource, Tushan, LoadingView } from "tushan";
 import { useSession } from "next-auth/react";
-import { IconApps } from "tushan/client/icon";
+import { IconCompass } from "tushan/client/icon";
 import React from "react";
 import { DeploymentCreate } from "./route/DeploymentCreate";
 import { DeploymentList } from "./route/DeploymentList";
@@ -31,7 +31,7 @@ export const Admin = React.memo(() => {
       <Resource
         name="deployment"
         label="Deployment"
-        icon={<IconApps />}
+        icon={<IconCompass />}
         list={<DeploymentList />}
         create={<DeploymentCreate />}
       />
