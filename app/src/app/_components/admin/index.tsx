@@ -7,6 +7,7 @@ import { IconCompass } from "tushan/client/icon";
 import React from "react";
 import { DeploymentCreate } from "./route/DeploymentCreate";
 import { DeploymentList } from "./route/DeploymentList";
+import { ClientRedirect } from "../Redirect";
 
 const dataProvider = jsonServerProvider("/api/admin");
 
@@ -22,8 +23,12 @@ export const Admin = React.memo(() => {
     return null;
   }
 
-  if (status !== "authenticated") {
+  if (status === "loading") {
     return <LoadingView />;
+  }
+
+  if (status === "unauthenticated") {
+    return <ClientRedirect to="/" />;
   }
 
   return (

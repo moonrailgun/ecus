@@ -4,6 +4,7 @@ import {
   PutObjectCommand,
   type PutObjectCommandInput,
   type PutObjectCommandOutput,
+  GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import mime from "mime";
 import path from "path";
@@ -41,4 +42,18 @@ export async function uploadFile(
 
     throw err;
   }
+}
+
+export async function getFile(key: string) {
+  const command = new GetObjectCommand({
+    Bucket: env.S3_BUCKET_NAME,
+    Key: key,
+  });
+
+  const { Body: body, ContentType: contentType } = await s3Client.send(command);
+
+  return {
+    body,
+    contentType,
+  };
 }

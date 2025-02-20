@@ -41,9 +41,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.0",
     "structured-headers": "^2.0.0",
     "superjson": "^2.2.1",
-    "tushan": "^0.3.16",
+    "tushan": "^0.3.18",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Button,
   Card,
@@ -10,6 +10,7 @@ import {
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 import { get } from "lodash-es";
+import { toast } from "sonner";
 
 const FormItem = Form.Item;
 
@@ -21,7 +22,7 @@ export const DeploymentCreate: React.FC = React.memo(() => {
       const file = get(args, ["bundle", 0, "originFile"]);
 
       if (!(file instanceof File)) {
-        Message.warning("Please upload file");
+        toast.warning("Please upload file");
         return;
       }
 
@@ -35,11 +36,11 @@ export const DeploymentCreate: React.FC = React.memo(() => {
       const json = await res.json();
 
       if (!res.ok) {
-        Message.error(JSON.stringify(json));
+        toast.error(JSON.stringify(json));
         throw new Error(JSON.stringify(json));
       }
 
-      Message.success("Upload success");
+      toast.success("Upload success");
 
       navigate("/deployment");
     },

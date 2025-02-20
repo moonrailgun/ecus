@@ -32,7 +32,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    // NEXT_PUBLIC_S3_HOST: z.string(),
   },
 
   /**
@@ -40,6 +40,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    // Server
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
@@ -50,6 +51,8 @@ export const env = createEnv({
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
     S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
+
+    // Client
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
