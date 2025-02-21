@@ -18,17 +18,32 @@ export async function processZipFile(zipFile: File) {
     dir: tempDir,
   });
 
-  await fs.rm(filePath);
+  await fs.rm(filePath); // remove zip file
 
-  const filelist = await fs.readdir(tempDir, {
+  let unzipDir = tempDir;
+
+  // open folder if its zip with folder
+  const l = await fs.readdir(unzipDir, {
+    withFileTypes: true,
+  });
+  if (l.length === 1 && l[0]?.isDirectory() === true) {
+    unzipDir += "/" + l[0].name;
+  }
+
+  const filelist = await fs.readdir(unzipDir, {
     withFileTypes: true,
     recursive: true,
   });
 
   return filelist
     .filter((f) => f.isFile())
-    .map((f) => ({
-      name: f.name,
-      path: path.resolve(f.parentPath, f.name),
-    }));
+    .map((f) => {
+      const p = path.resolve(f.parentPath, f.name);
+
+      return {
+        name: f.name,
+        key: path.relative(unzipDir, p),
+        path: p,
+      };
+    });
 }

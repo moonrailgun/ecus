@@ -73,7 +73,11 @@ export async function PUT(
 
     await Promise.all(
       filelist.map(async (f) => {
-        const key = `${dir}/${f.name}`;
+        if (f.key.startsWith(".")) {
+          return;
+        }
+
+        const key = `${dir}/${f.key}`;
         const file = await fs.readFile(f.path);
 
         await uploadFile(key, file);

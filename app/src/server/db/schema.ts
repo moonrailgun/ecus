@@ -168,6 +168,29 @@ export const branchRelations = relations(branch, ({ one, many }) => ({
   deployment: many(deployment),
 }));
 
+export const activeDeployments = createTable(
+  "active_deployment",
+  {
+    projectId: varchar("project_id", { length: 255 }).notNull(),
+    runtimeVersion: varchar("runtime_version", { length: 255 }).notNull(),
+    branchId: varchar("branch_id", { length: 255 }).notNull(),
+    deploymentId: varchar("deployment_id", {
+      length: 255,
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (ad) => ({
+    compoundKey: primaryKey({
+      columns: [ad.projectId, ad.runtimeVersion, ad.branchId, ad.deploymentId],
+    }),
+  }),
+);
+
 export const deployment = createTable("deployment", {
   id: varchar("id", { length: 255 })
     .primaryKey()

@@ -7,11 +7,15 @@ import {
   createCustomField,
   ListTable,
   useNavigate,
+  createDateTimeField,
+  Tabs,
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
-import { IconPlus } from "tushan/client/icon";
+import { IconPlus } from "tushan/icon";
 import { first, get } from "lodash-es";
 import { RemoteFileViewer } from "../../RemoteFileViewer";
+import { PromoteDeploymentModal } from "./PromoteDeploymentModal";
+import { openModal } from "../../AdminGlobalModal";
 
 const fields = [
   createTextField("id", {
@@ -22,6 +26,11 @@ const fields = [
     list: {
       width: 160,
     },
+  }),
+  createReferenceField("branchId", {
+    label: "Branch",
+    reference: "branch",
+    displayField: "name",
   }),
   createReferenceField("userId", {
     label: "User",
@@ -36,27 +45,31 @@ const fields = [
       </Avatar>
     ),
   }),
+  createDateTimeField("createdAt", {
+    label: "createdAt",
+  }),
 ];
 
 const drawerFields = [
   ...fields,
   createCustomField("id", {
-    label: "Metadata",
-    render: (id) => {
-      return (
-        <RemoteFileViewer
-          url={`/api/${useAdminStore.getState().projectId}/updates/${id}/metadata.json`}
-        />
-      );
-    },
-  }),
-  createCustomField("id", {
     label: "Config",
     render: (id) => {
+      const projectId = useAdminStore.getState().projectId;
+
       return (
-        <RemoteFileViewer
-          url={`/api/${useAdminStore.getState().projectId}/updates/${id}/expoConfig.json`}
-        />
+        <Tabs>
+          <Tabs.TabPane key="meta" title="Metadata" lazyload>
+            <RemoteFileViewer
+              url={`/api/${projectId}/updates/${id}/metadata.json`}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane key="expo" title="Expo" lazyload>
+            <RemoteFileViewer
+              url={`/api/${projectId}/updates/${id}/expoConfig.json`}
+            />
+          </Tabs.TabPane>
+        </Tabs>
       );
     },
   }),
@@ -82,6 +95,28 @@ export const DeploymentList: React.FC = React.memo(() => {
         drawerFields={drawerFields}
         action={{
           detail: true,
+          custom: [
+            {
+              key: "assign",
+              label: "Assign Branch",
+              onClick: (record) => {
+                // TODO
+                console.log("record", record);
+              },
+            },
+            {
+              key: "promote",
+              label: "Promote",
+              onClick: (record) => {
+                openModal(
+                  <PromoteDeploymentModal
+                    deploymentId={String(record.id)}
+                    runtimeVersion={String(record.runtimeVersion)}
+                  />,
+                );
+              },
+            },
+          ],
         }}
       />
     </>

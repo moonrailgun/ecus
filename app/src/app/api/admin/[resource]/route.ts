@@ -1,5 +1,4 @@
 import { db } from "@/server/db";
-import { deployment } from "@/server/db/schema";
 import { count, desc } from "drizzle-orm";
 import { get } from "lodash-es";
 import { type NextRequest, NextResponse } from "next/server";
@@ -24,7 +23,7 @@ export async function GET(
         .from(table)
         .limit(end - start)
         .offset(start)
-        .orderBy(desc(deployment.id)),
+        .orderBy(desc((table as any).createdAt ?? (table as any).id)),
       db.select({ count: count() }).from(table),
     ]);
 

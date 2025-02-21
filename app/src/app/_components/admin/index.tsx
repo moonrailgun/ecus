@@ -8,6 +8,8 @@ import React from "react";
 import { DeploymentCreate } from "./route/DeploymentCreate";
 import { DeploymentList } from "./route/DeploymentList";
 import { ClientRedirect } from "../Redirect";
+import { ActiveList } from "./route/ActiveList";
+import { AdminGlobalModal } from "../AdminGlobalModal";
 
 const dataProvider = jsonServerProvider("/api/admin");
 
@@ -40,6 +42,13 @@ export const Admin = React.memo(() => {
         list={<DeploymentList />}
         create={<DeploymentCreate />}
       />
+      <Resource
+        name="active"
+        label="Active"
+        icon={<IconCompass />}
+        list={<ActiveList />}
+      />
+      <AdminGlobalModal />
     </Tushan>
   );
 });

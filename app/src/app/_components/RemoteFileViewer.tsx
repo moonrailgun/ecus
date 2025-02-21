@@ -42,7 +42,7 @@ export const RemoteFileViewer: React.FC<RemoteFileViewerProps> = React.memo(
 
     const json = useMemo(() => {
       try {
-        return JSON.parse(content), null, 2;
+        return JSON.parse(content);
       } catch {
         return String(content);
       }
