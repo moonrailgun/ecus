@@ -22,7 +22,7 @@ export async function GET(
     }
 
     const { body, contentType } = await getFile(
-      `iexpo/${projectId}/updates/${deploymentId}/${key}`,
+      `ecus/${projectId}/updates/${deploymentId}/${key}`,
     );
 
     if (!body) {

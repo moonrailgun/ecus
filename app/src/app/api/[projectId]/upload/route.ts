@@ -69,7 +69,7 @@ export async function PUT(
       filelist,
     );
 
-    const dir = `iexpo/${projectId}/updates/${id}`;
+    const dir = `ecus/${projectId}/updates/${id}`;
 
     await Promise.all(
       filelist.map(async (f) => {
