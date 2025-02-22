@@ -1,9 +1,7 @@
-import { uploadFile } from "@/server/file/client";
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
 import { processZipFile } from "@/server/file/utils";
-import fs from "fs/promises";
-import { createDeploymentWithFileList } from "@/server/api/deployment";
+import { createDeploymentAndUploadFiles } from "@/server/api/deployment";
 
 export async function PUT(
   request: NextRequest,
@@ -63,33 +61,15 @@ export async function PUT(
       );
     }
 
-    const id = await createDeploymentWithFileList(
+    const { id, list } = await createDeploymentAndUploadFiles(
       projectId,
       session.user.id,
       filelist,
     );
 
-    const dir = `ecus/${projectId}/updates/${id}`;
-
-    await Promise.all(
-      filelist.map(async (f) => {
-        if (f.key.startsWith(".")) {
-          return;
-        }
-
-        const key = `${dir}/${f.key}`;
-        const file = await fs.readFile(f.path);
-
-        await uploadFile(key, file);
-      }),
-    );
-
     return NextResponse.json({
       id,
-      filelist: filelist.map((f) => ({
-        name: f.name,
-        key: `${dir}/${f.name}`,
-      })),
+      list,
     });
   } catch (err) {
     return NextResponse.json(

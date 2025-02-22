@@ -146,7 +146,7 @@ export const project = createTable("project", {
 });
 
 export const projectRelations = relations(project, ({ many }) => ({
-  deployment: many(deployment),
+  deployments: many(deployments),
 }));
 
 export const branch = createTable("branch", {
@@ -168,7 +168,7 @@ export const branchRelations = relations(branch, ({ one, many }) => ({
     fields: [branch.projectId],
     references: [project.id],
   }),
-  deployment: many(deployment),
+  deployments: many(deployments),
 }));
 
 export const activeDeployments = createTable(
@@ -189,7 +189,8 @@ export const activeDeployments = createTable(
   },
   (ad) => ({
     compoundKey: primaryKey({
-      columns: [ad.projectId, ad.runtimeVersion, ad.branchId, ad.deploymentId],
+      name: "active_deployment_pk",
+      columns: [ad.projectId, ad.runtimeVersion, ad.branchId],
     }),
   }),
 );
