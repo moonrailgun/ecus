@@ -168,7 +168,6 @@ export const branchRelations = relations(branch, ({ one, many }) => ({
     fields: [branch.projectId],
     references: [project.id],
   }),
-  deployments: many(deployments),
 }));
 
 export const activeDeployments = createTable(
@@ -201,7 +200,6 @@ export const deployments = createTable("deployment", {
     .$defaultFn(() => createCuid()),
   userId: varchar("user_id", { length: 255 }).notNull(),
   projectId: varchar("project_id", { length: 255 }).notNull(),
-  branchId: varchar("branch_id", { length: 255 }),
   runtimeVersion: varchar("runtime_version", { length: 255 }),
   expoConfig: jsonb("expo_config")
     .notNull()
@@ -225,9 +223,5 @@ export const deploymentRelations = relations(deployments, ({ one }) => ({
   project: one(project, {
     fields: [deployments.projectId],
     references: [project.id],
-  }),
-  branch: one(branch, {
-    fields: [deployments.branchId],
-    references: [branch.id],
   }),
 }));
