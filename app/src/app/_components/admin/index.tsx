@@ -38,8 +38,8 @@ export const Admin = React.memo(() => {
     <Tushan
       basename="/admin"
       dashboard={false}
-      header={
-        <div className="flex items-center gap-4">
+      navbar={
+        <div className="flex items-center gap-4 px-4 py-3">
           <div className="text-lg font-bold">ECUS</div>
           <ProjectSwitcher />
         </div>

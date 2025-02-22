@@ -87,8 +87,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.2
       tushan:
-        specifier: ^0.3.21
-        version: 0.3.21(@babel/core@7.26.9)(react-native@0.76.7(@babel/core@7.26.9)(@babel/preset-env@7.26.9(@babel/core@7.26.9))(@types/react@18.3.18)(react@18.2.0))
+        specifier: ^0.3.22
+        version: 0.3.22(@babel/core@7.26.9)(react-native@0.76.7(@babel/core@7.26.9)(@babel/preset-env@7.26.9(@babel/core@7.26.9))(@types/react@18.3.18)(react@18.2.0))
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -6913,8 +6913,8 @@ packages:
   turbo-stream@2.4.0:
     resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
 
-  tushan@0.3.21:
-    resolution: {integrity: sha512-BHM3ES8wDqCdEPWdOz1smR84FqyvfHUU5LWLp50p1UUWsqYR37kJcaGtH1WXoJeQ81VZ1VyTjaqjq+ETWUYfcQ==}
+  tushan@0.3.22:
+    resolution: {integrity: sha512-J+54Onrr6bJ3O5wR5j0VyLdTW+TWHD25gEXYiEXj3XIqZD3h0S9HkEtq3jWTz2k6IEklW78UDRf66/gPiKBgcA==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -15544,7 +15544,7 @@ snapshots:
 
   turbo-stream@2.4.0: {}
 
-  tushan@0.3.21(@babel/core@7.26.9)(react-native@0.76.7(@babel/core@7.26.9)(@babel/preset-env@7.26.9(@babel/core@7.26.9))(@types/react@18.3.18)(react@18.2.0)):
+  tushan@0.3.22(@babel/core@7.26.9)(react-native@0.76.7(@babel/core@7.26.9)(@babel/preset-env@7.26.9(@babel/core@7.26.9))(@types/react@18.3.18)(react@18.2.0)):
     dependencies:
       '@arco-design/web-react': 2.65.0(@types/react@18.3.18)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0(react@18.2.0))(react-native@0.76.7(@babel/core@7.26.9)(@babel/preset-env@7.26.9(@babel/core@7.26.9))(@types/react@18.3.18)(react@18.2.0))(react@18.2.0)
