@@ -51,6 +51,14 @@ export const authConfig = {
     GitHubProvider({
       clientId: env.AUTH_GITHUB_ID,
       clientSecret: env.AUTH_GITHUB_SECRET,
+      authorization: {
+        url: `https://github.com/login/oauth/authorize`,
+        params: {
+          scope: env.AUTH_GITHUB_ORGANIZATION
+            ? "read:user user:email read:org"
+            : "read:user user:email",
+        },
+      },
     }),
   ],
   adapter: DrizzleAdapter(db, {
@@ -67,5 +75,35 @@ export const authConfig = {
         id: user.id,
       },
     }),
+    signIn: async ({ account }) => {
+      if (
+        account &&
+        account.provider === "github" &&
+        env.AUTH_GITHUB_ORGANIZATION
+      ) {
+        const accessToken = account.access_token;
+        try {
+          const response = await fetch(`https://api.github.com/user/orgs`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          const orgs = await response.json();
+
+          const isMember = orgs.some(
+            (org: any) => org.login === env.AUTH_GITHUB_ORGANIZATION,
+          );
+          if (isMember) {
+            return true;
+          } else {
+            return false;
+          }
+        } catch (error) {
+          console.error("Error fetching GitHub organizations:", error);
+          return false;
+        }
+      }
+      return true;
+    },
   },
 } satisfies NextAuthConfig;

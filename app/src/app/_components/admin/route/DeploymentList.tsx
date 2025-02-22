@@ -9,6 +9,7 @@ import {
   useNavigate,
   createDateTimeField,
   Tabs,
+  LoadingView,
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 import { IconPlus } from "tushan/icon";
@@ -93,7 +94,7 @@ export const DeploymentList: React.FC = React.memo(() => {
   const navigate = useNavigate();
 
   if (!projectId) {
-    return null;
+    return <LoadingView />;
   }
 
   return (

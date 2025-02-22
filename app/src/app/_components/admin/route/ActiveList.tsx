@@ -4,6 +4,7 @@ import {
   createTextField,
   ListTable,
   createDateTimeField,
+  LoadingView,
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 
@@ -25,6 +26,10 @@ const fields = [
 
 export const ActiveList: React.FC = React.memo(() => {
   const projectId = useAdminStore((state) => state.projectId);
+
+  if (!projectId) {
+    return <LoadingView />;
+  }
 
   return (
     <>
