@@ -16,6 +16,7 @@ import { first, get } from "lodash-es";
 import { RemoteFileViewer } from "../../RemoteFileViewer";
 import { PromoteDeploymentModal } from "./PromoteDeploymentModal";
 import { openModal } from "../../AdminGlobalModal";
+import { DeploymentStatus } from "./DeploymentStatusField";
 
 const fields = [
   createTextField("id", {
@@ -31,6 +32,18 @@ const fields = [
     label: "Branch",
     reference: "branch",
     displayField: "name",
+  }),
+  createCustomField("id", {
+    label: "Status",
+    render: (id, record) => {
+      return (
+        <DeploymentStatus
+          deploymentId={String(record.id)}
+          projectId={record.projectId}
+          runtimeVersion={record.runtimeVersion}
+        />
+      );
+    },
   }),
   createReferenceField("userId", {
     label: "User",
@@ -79,6 +92,10 @@ export const DeploymentList: React.FC = React.memo(() => {
   const projectId = useAdminStore((state) => state.projectId);
   const navigate = useNavigate();
 
+  if (!projectId) {
+    return null;
+  }
+
   return (
     <>
       <Button
@@ -96,14 +113,14 @@ export const DeploymentList: React.FC = React.memo(() => {
         action={{
           detail: true,
           custom: [
-            {
-              key: "assign",
-              label: "Assign Branch",
-              onClick: (record) => {
-                // TODO
-                console.log("record", record);
-              },
-            },
+            // {
+            //   key: "assign",
+            //   label: "Assign Branch",
+            //   onClick: (record) => {
+            //     // TODO
+            //     console.log("record", record);
+            //   },
+            // },
             {
               key: "promote",
               label: "Promote",

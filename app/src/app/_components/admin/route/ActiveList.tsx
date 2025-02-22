@@ -10,8 +10,16 @@ import { useAdminStore } from "../useAdminStore";
 const fields = [
   createTextField("projectId"),
   createTextField("runtimeVersion"),
-  createTextField("branchId"),
-  createReferenceField("deploymentId"),
+  createReferenceField("branchId", {
+    label: "Branch",
+    reference: "branch",
+    displayField: "name",
+  }),
+  createReferenceField("deploymentId", {
+    label: "Deployment",
+    reference: "deployment",
+    displayField: (record) => <div>{record.id}</div>,
+  }),
   createDateTimeField("updatedAt"),
 ];
 

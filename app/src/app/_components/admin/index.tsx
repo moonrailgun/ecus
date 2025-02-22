@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { jsonServerProvider, Resource, Tushan, LoadingView } from "tushan";
 import { useSession } from "next-auth/react";
-import { IconCompass } from "tushan/client/icon";
+import { IconCompass, IconWifi } from "tushan/icon";
 import React from "react";
 import { DeploymentCreate } from "./route/DeploymentCreate";
 import { DeploymentList } from "./route/DeploymentList";
 import { ClientRedirect } from "../Redirect";
 import { ActiveList } from "./route/ActiveList";
 import { AdminGlobalModal } from "../AdminGlobalModal";
+import { ProjectSwitcher } from "./ProjectSwitcher";
 
 const dataProvider = jsonServerProvider("/api/admin");
 
@@ -34,7 +35,17 @@ export const Admin = React.memo(() => {
   }
 
   return (
-    <Tushan basename="/admin" dataProvider={dataProvider}>
+    <Tushan
+      basename="/admin"
+      dashboard={false}
+      header={
+        <div className="flex items-center gap-4">
+          <div className="text-lg font-bold">ECUS</div>
+          <ProjectSwitcher />
+        </div>
+      }
+      dataProvider={dataProvider}
+    >
       <Resource
         name="deployment"
         label="Deployment"
@@ -45,7 +56,7 @@ export const Admin = React.memo(() => {
       <Resource
         name="active"
         label="Active"
-        icon={<IconCompass />}
+        icon={<IconWifi />}
         list={<ActiveList />}
       />
       <AdminGlobalModal />

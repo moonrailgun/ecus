@@ -15,7 +15,9 @@ const FormItem = Form.Item;
 
 export const DeploymentCreate: React.FC = React.memo(() => {
   const projectId = useAdminStore((state) => state.projectId);
+  const projectName = useAdminStore((state) => state.projectName);
   const navigate = useNavigate();
+
   const [handleSubmit, isLoading] = useEventWithLoading(
     async (args: unknown) => {
       const file = get(args, ["bundle", 0, "originFile"]);
@@ -48,6 +50,9 @@ export const DeploymentCreate: React.FC = React.memo(() => {
   return (
     <Card>
       <Form style={{ width: 600 }} autoComplete="off" onSubmit={handleSubmit}>
+        <FormItem label="Project">
+          <div>{projectName}</div>
+        </FormItem>
         <FormItem label="Bundle" field="bundle" triggerPropName="fileList">
           <Upload
             drag

@@ -1,8 +1,9 @@
 import { db } from "@/server/db";
-import { count, desc } from "drizzle-orm";
+import { count, desc, eq, sql, SQL } from "drizzle-orm";
 import { get } from "lodash-es";
 import { type NextRequest, NextResponse } from "next/server";
 import { resourceMap } from "./_resource";
+import { activeDeployments, deployments } from "@/server/db/schema";
 
 export async function GET(
   request: NextRequest,
@@ -17,14 +18,30 @@ export async function GET(
 
   if (resource in resourceMap) {
     const table = resourceMap[resource]!;
+    let where: SQL = sql`1 = 1`;
+
+    if (resource === "deployment") {
+      const projectId = searchParams.get("projectId");
+      if (projectId) {
+        where = eq(deployments.projectId, projectId);
+      }
+    }
+    if (resource === "active") {
+      const projectId = searchParams.get("projectId");
+      if (projectId) {
+        where = eq(activeDeployments.projectId, projectId);
+      }
+    }
+
     const [res, rowCount] = await Promise.all([
       db
         .select()
         .from(table)
+        .where(where)
         .limit(end - start)
         .offset(start)
         .orderBy(desc((table as any).createdAt ?? (table as any).id)),
-      db.select({ count: count() }).from(table),
+      db.select({ count: count() }).from(table).where(where),
     ]);
 
     return NextResponse.json(res, {

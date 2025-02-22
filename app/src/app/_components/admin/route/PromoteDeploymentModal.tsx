@@ -10,6 +10,7 @@ import {
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 import { toast } from "sonner";
+import { closeModal } from "../../AdminGlobalModal";
 
 interface Props {
   deploymentId: string;
@@ -21,6 +22,7 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
   const projectId = useAdminStore((state) => state.projectId);
   const refreshDeploymentList = useRefreshList("deployment");
   const refreshActiveList = useRefreshList("active");
+  const trpcUtils = api.useUtils();
 
   const [handleSubmit, isLoading] = useEventWithLoading(async (values) => {
     if (!values.branchId) {
@@ -35,8 +37,13 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
       deploymentId,
     });
 
+    trpcUtils.deployment.activeDeployment.invalidate({
+      projectId,
+      runtimeVersion,
+    });
     refreshDeploymentList();
     refreshActiveList();
+    closeModal();
   });
 
   return (
