@@ -19,6 +19,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    S3_PUBLIC_HOST: z.string(),
     S3_ENDPOINT: z.string().optional(),
     S3_REGION: z.string().default('us-east-1'),
     S3_BUCKET_NAME: z.string(),
@@ -46,6 +47,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    S3_PUBLIC_HOST: process.env.S3_PUBLIC_HOST,
     S3_ENDPOINT: process.env.S3_ENDPOINT,
     S3_REGION: process.env.S3_REGION,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,

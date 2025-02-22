@@ -15,8 +15,12 @@ import {
   createRollBackDirectiveAsync,
   NoUpdateAvailableError,
   createNoUpdateAvailableDirectiveAsync,
+  getAssetMetadataFromS3,
 } from "@/server/api/expo/helper";
 import { serializeDictionary } from "structured-headers";
+import { InferModel, InferSelectModel } from "drizzle-orm";
+import { deployments } from "@/server/db/schema";
+import { buildDeploymentKey } from "@/server/file/helper";
 
 export enum UpdateType {
   NORMAL_UPDATE,
@@ -34,42 +38,33 @@ export async function getTypeOfUpdateAsync(
 
 export async function putUpdateInResponseAsync(
   request: NextRequest,
-  updateBundlePath: string,
+  deployment: InferSelectModel<typeof deployments>,
   runtimeVersion: string,
-  platform: string,
+  platform: "ios" | "android",
   protocolVersion: number,
 ): Promise<Response> {
   const currentUpdateId = request.headers.get("expo-current-update-id");
   const expectSignatureHeader = request.headers.get("expo-expect-signature");
 
-  const { metadataJson, createdAt, id } = await getMetadataAsync({
-    updateBundlePath,
-    runtimeVersion,
-  });
+  const metadata = deployment.metadata;
+  const expoConfig = deployment.expoConfig;
 
   // NoUpdateAvailable directive only supported on protocol version 1
   // for protocol version 0, serve most recent update as normal
-  if (
-    currentUpdateId === convertSHA256HashToUUID(id) &&
-    protocolVersion === 1
-  ) {
+  if (currentUpdateId === deployment.id && protocolVersion === 1) {
     throw new NoUpdateAvailableError();
   }
 
-  const expoConfig = await getExpoConfigAsync({
-    updateBundlePath,
-    runtimeVersion,
-  });
-  const platformSpecificMetadata = metadataJson.fileMetadata[platform];
+  const platformSpecificMetadata = metadata.fileMetadata[platform];
   const manifest = {
-    id: convertSHA256HashToUUID(id),
-    createdAt,
+    id: deployment.id,
+    createdAt: deployment.createdAt,
     runtimeVersion,
     assets: await Promise.all(
-      (platformSpecificMetadata.assets as any[]).map((asset: any) =>
-        getAssetMetadataAsync({
-          updateBundlePath,
-          filePath: asset.path,
+      platformSpecificMetadata.assets.map((asset) =>
+        getAssetMetadataFromS3({
+          deployment,
+          key: `${buildDeploymentKey(deployment.projectId, deployment.id)}/${asset.path}`,
           ext: asset.ext,
           runtimeVersion,
           platform,
@@ -77,9 +72,9 @@ export async function putUpdateInResponseAsync(
         }),
       ),
     ),
-    launchAsset: await getAssetMetadataAsync({
-      updateBundlePath,
-      filePath: platformSpecificMetadata.bundle,
+    launchAsset: await getAssetMetadataFromS3({
+      deployment,
+      key: `${buildDeploymentKey(deployment.projectId, deployment.id)}/${platformSpecificMetadata.bundle}`,
       isLaunchAsset: true,
       runtimeVersion,
       platform,
@@ -116,9 +111,11 @@ export async function putUpdateInResponseAsync(
 
   const assetRequestHeaders: Record<string, object> = {};
   [...manifest.assets, manifest.launchAsset].forEach((asset) => {
-    assetRequestHeaders[asset.key] = {
-      "test-header": "test-header-value",
-    };
+    if (asset.key) {
+      assetRequestHeaders[asset.key] = {
+        "test-header": "test-header-value",
+      };
+    }
   });
 
   const form = new FormData();

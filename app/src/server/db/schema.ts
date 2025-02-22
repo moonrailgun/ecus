@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  jsonb,
   pgTableCreator,
   primaryKey,
   text,
@@ -10,6 +11,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 import { createId as createCuid } from "@paralleldrive/cuid2";
+import { z } from "zod";
+import { expoConfigSchema, expoMetadataSchema } from "../api/expo/schema";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -191,7 +194,7 @@ export const activeDeployments = createTable(
   }),
 );
 
-export const deployment = createTable("deployment", {
+export const deployments = createTable("deployment", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .$defaultFn(() => createCuid()),
@@ -199,6 +202,12 @@ export const deployment = createTable("deployment", {
   projectId: varchar("project_id", { length: 255 }).notNull(),
   branchId: varchar("branch_id", { length: 255 }),
   runtimeVersion: varchar("runtime_version", { length: 255 }),
+  expoConfig: jsonb("expo_config")
+    .notNull()
+    .$type<z.infer<typeof expoConfigSchema>>(),
+  metadata: jsonb("metadata")
+    .notNull()
+    .$type<z.infer<typeof expoMetadataSchema>>(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -207,17 +216,17 @@ export const deployment = createTable("deployment", {
   ),
 });
 
-export const deploymentRelations = relations(deployment, ({ one }) => ({
+export const deploymentRelations = relations(deployments, ({ one }) => ({
   author: one(users, {
-    fields: [deployment.userId],
+    fields: [deployments.userId],
     references: [users.id],
   }),
   project: one(project, {
-    fields: [deployment.projectId],
+    fields: [deployments.projectId],
     references: [project.id],
   }),
   branch: one(branch, {
-    fields: [deployment.branchId],
+    fields: [deployments.branchId],
     references: [branch.id],
   }),
 }));

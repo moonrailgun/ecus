@@ -5,6 +5,9 @@ import {
   type PutObjectCommandInput,
   type PutObjectCommandOutput,
   GetObjectCommand,
+  GetObjectAttributesCommand,
+  ObjectAttributes,
+  ChecksumAlgorithm,
 } from "@aws-sdk/client-s3";
 import mime from "mime";
 import path from "path";
@@ -30,6 +33,7 @@ export async function uploadFile(
       Key: key, // 文件存储在 S3 上的路径
       Body: buffer,
       ContentType: mimeType ?? undefined,
+      ChecksumAlgorithm: ChecksumAlgorithm.SHA256,
     } satisfies PutObjectCommandInput;
 
     const command = new PutObjectCommand(uploadParams);
@@ -55,5 +59,20 @@ export async function getFile(key: string) {
   return {
     body,
     contentType,
+  };
+}
+
+export async function getFileMetadata(key: string) {
+  const command = new GetObjectAttributesCommand({
+    Bucket: env.S3_BUCKET_NAME,
+    Key: key,
+    ObjectAttributes: [ObjectAttributes.ETAG, ObjectAttributes.CHECKSUM],
+  });
+
+  const res = await s3Client.send(command);
+
+  return {
+    key: res.ETag,
+    hash: res.Checksum,
   };
 }

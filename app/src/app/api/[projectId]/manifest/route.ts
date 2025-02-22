@@ -5,6 +5,7 @@
 import { type NextRequest } from "next/server";
 import {
   getLatestUpdateBundlePathForRuntimeVersionAsync,
+  getRuntimeVersionActiveDeployment,
   NoUpdateAvailableError,
 } from "@/server/api/expo/helper";
 import {
@@ -14,8 +15,16 @@ import {
   UpdateType,
 } from "@/server/api/expo/manifest";
 import { putNoUpdateAvailableInResponseAsync } from "@/server/api/expo/manifest";
+import { db } from "@/server/db";
+import { deployments } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ projectId: string }> },
+) {
+  const urlParams = await params;
+  const projectId = urlParams.projectId;
   const searchParams = request.nextUrl.searchParams;
   const protocolVersionMaybeArray = request.headers.get(
     "expo-protocol-version",
@@ -61,14 +70,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  let updateBundlePath: string;
-  try {
-    updateBundlePath =
-      await getLatestUpdateBundlePathForRuntimeVersionAsync(runtimeVersion);
-  } catch (error: any) {
+  const activeDeployment = await getRuntimeVersionActiveDeployment(
+    projectId,
+    runtimeVersion,
+  );
+
+  if (!activeDeployment) {
+    // no runtime version
     return Response.json(
       {
-        error: error.message,
+        error: "Unsupported runtime version",
       },
       {
         status: 404,
@@ -76,35 +87,52 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const updateType = await getTypeOfUpdateAsync(updateBundlePath);
-
   try {
-    try {
-      if (updateType === UpdateType.NORMAL_UPDATE) {
-        return await putUpdateInResponseAsync(
-          request,
-          updateBundlePath,
-          runtimeVersion,
-          platform,
-          protocolVersion,
-        );
-      } else if (updateType === UpdateType.ROLLBACK) {
-        return await putRollBackInResponseAsync(
-          request,
-          updateBundlePath,
-          protocolVersion,
-        );
+    if (activeDeployment.deploymentId) {
+      // its should be normal update
+      const res = await db
+        .select()
+        .from(deployments)
+        .where(eq(deployments.id, activeDeployment.deploymentId))
+        .limit(1);
+
+      if (!res[0]) {
+        throw new Error("Not found target deployment");
       }
-    } catch (maybeNoUpdateAvailableError) {
-      if (maybeNoUpdateAvailableError instanceof NoUpdateAvailableError) {
-        return await putNoUpdateAvailableInResponseAsync(
-          request,
-          protocolVersion,
-        );
-      }
-      throw maybeNoUpdateAvailableError;
+
+      return await putUpdateInResponseAsync(
+        request,
+        res[0],
+        runtimeVersion,
+        platform,
+        protocolVersion,
+      );
+    } else {
+      // its should be rollback action
+      // TODO
+      // return await putRollBackInResponseAsync(
+      //   request,
+      //   updateBundlePath,
+      //   protocolVersion,
+      // );
+
+      return Response.json(
+        {
+          error: "not implement yet",
+        },
+        {
+          status: 404,
+        },
+      );
     }
   } catch (error) {
+    if (error instanceof NoUpdateAvailableError) {
+      return await putNoUpdateAvailableInResponseAsync(
+        request,
+        protocolVersion,
+      );
+    }
+
     console.error(error);
 
     return Response.json(

@@ -1,27 +1,21 @@
 import { z } from "zod";
 
+export const expoMetadataFileAssets = z.object({
+  bundle: z.string(),
+  assets: z.array(
+    z.object({
+      path: z.string(),
+      ext: z.string(),
+    }),
+  ),
+});
+
 export const expoMetadataSchema = z.object({
   version: z.number(),
   bundler: z.string(),
   fileMetadata: z.object({
-    ios: z.object({
-      bundle: z.string(),
-      assets: z.array(
-        z.object({
-          path: z.string(),
-          ext: z.string(),
-        }),
-      ),
-    }),
-    android: z.object({
-      bundle: z.string(),
-      assets: z.array(
-        z.object({
-          path: z.string(),
-          ext: z.string(),
-        }),
-      ),
-    }),
+    ios: expoMetadataFileAssets,
+    android: expoMetadataFileAssets,
   }),
 });
 

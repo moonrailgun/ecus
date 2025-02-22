@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { env } from "@/env";
+import { db } from "@/server/db";
+import { activeDeployments, deployments } from "@/server/db/schema";
+import { getFileMetadata } from "@/server/file/client";
+import {
+  buildDeploymentKey,
+  buildDeploymentManifestPath,
+} from "@/server/file/helper";
 import crypto, { type BinaryToTextEncoding } from "crypto";
+import { and, eq, InferSelectModel } from "drizzle-orm";
 import fsSync from "fs";
 import fs from "fs/promises";
 import mime from "mime";
@@ -51,34 +60,67 @@ export async function getPrivateKeyAsync() {
   return pemBuffer.toString("utf8");
 }
 
-export async function getLatestUpdateBundlePathForRuntimeVersionAsync(
+export async function getRuntimeVersionActiveDeployment(
+  projectId: string,
   runtimeVersion: string,
 ) {
-  const updatesDirectoryForRuntimeVersion = `updates/${runtimeVersion}`;
-  if (!fsSync.existsSync(updatesDirectoryForRuntimeVersion)) {
+  const res = await db
+    .select()
+    .from(activeDeployments)
+    .where(
+      and(
+        eq(activeDeployments.runtimeVersion, runtimeVersion),
+        eq(activeDeployments.projectId, projectId),
+      ),
+    )
+    .limit(1);
+
+  return res[0] ?? null;
+}
+
+export async function getLatestUpdateBundlePathForRuntimeVersionAsync(
+  projectId: string,
+  runtimeVersion: string,
+) {
+  const deployments = await db
+    .select()
+    .from(activeDeployments)
+    .where(
+      and(
+        eq(activeDeployments.runtimeVersion, runtimeVersion),
+        eq(activeDeployments.projectId, projectId),
+      ),
+    )
+    .limit(1);
+
+  if (!deployments || !deployments[0] || !deployments[0]!.deploymentId) {
     throw new Error("Unsupported runtime version");
   }
 
-  const filesInUpdatesDirectory = await fs.readdir(
-    updatesDirectoryForRuntimeVersion,
-  );
-  const directoriesInUpdatesDirectory = (
-    await Promise.all(
-      filesInUpdatesDirectory.map(async (file) => {
-        const fileStat = await fs.stat(
-          path.join(updatesDirectoryForRuntimeVersion, file),
-        );
-        return fileStat.isDirectory() ? file : null;
-      }),
-    )
-  )
-    .filter(truthy)
-    .sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
-  return path.join(
-    updatesDirectoryForRuntimeVersion,
-    directoriesInUpdatesDirectory[0]!,
-  );
+  const deploymentId = deployments[0].deploymentId;
+
+  const path = buildDeploymentManifestPath(projectId, deploymentId);
+
+  return path;
 }
+
+type GetAssetMetadataFromS3Arg =
+  | {
+      deployment: InferSelectModel<typeof deployments>;
+      key: string;
+      ext: null;
+      isLaunchAsset: true;
+      runtimeVersion: string;
+      platform: string;
+    }
+  | {
+      deployment: InferSelectModel<typeof deployments>;
+      key: string;
+      ext: string;
+      isLaunchAsset: false;
+      runtimeVersion: string;
+      platform: string;
+    };
 
 type GetAssetMetadataArg =
   | {
@@ -98,6 +140,28 @@ type GetAssetMetadataArg =
       platform: string;
     };
 
+export async function getAssetMetadataFromS3(arg: GetAssetMetadataFromS3Arg) {
+  const res = await getFileMetadata(arg.key);
+
+  const keyExtensionSuffix = arg.isLaunchAsset ? "bundle" : arg.ext;
+  const contentType = arg.isLaunchAsset
+    ? "application/javascript"
+    : mime.getType(arg.ext);
+
+  return {
+    hash: res.hash,
+    key: res.key,
+    fileExtension: `.${keyExtensionSuffix}`,
+    contentType,
+    // TODO for check(maybe need middleware rather then direct download)
+    // url: `${env.S3_PUBLIC_HOST}/api/assets?asset=${assetFilePath}&runtimeVersion=${arg.runtimeVersion}&platform=${arg.platform}`,
+    url: `${env.S3_PUBLIC_HOST}/${arg.key}`,
+  };
+}
+
+/**
+ * @deprecated
+ */
 export async function getAssetMetadataAsync(arg: GetAssetMetadataArg) {
   const assetFilePath = `${arg.updateBundlePath}/${arg.filePath}`;
   const asset = await fs.readFile(path.resolve(assetFilePath), null);

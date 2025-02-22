@@ -13,7 +13,12 @@ import {
 } from "@/server/api/expo/helper";
 import { get } from "lodash-es";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ projectId: string }> },
+) {
+  const urlParams = await params;
+  const projectId = urlParams.projectId;
   const searchParams = request.nextUrl.searchParams;
   const assetName = searchParams.get("asset");
   const runtimeVersion = searchParams.get("runtimeVersion");
@@ -48,8 +53,10 @@ export async function GET(request: NextRequest) {
 
   let updateBundlePath: string;
   try {
-    updateBundlePath =
-      await getLatestUpdateBundlePathForRuntimeVersionAsync(runtimeVersion);
+    updateBundlePath = await getLatestUpdateBundlePathForRuntimeVersionAsync(
+      projectId,
+      runtimeVersion,
+    );
   } catch (error) {
     return Response.json(
       { error: get(error, "message") },

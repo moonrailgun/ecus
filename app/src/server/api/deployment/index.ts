@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import { expoConfigSchema, expoMetadataSchema } from "../expo/schema";
 import { db } from "@/server/db";
-import { deployment } from "@/server/db/schema";
+import { deployments } from "@/server/db/schema";
 
 export async function createDeploymentWithFileList(
   projectId: string,
@@ -19,10 +19,9 @@ export async function createDeploymentWithFileList(
     throw new Error("Its not a expo bundle");
   }
 
-  // TODO
-  // const metadata = expoMetadataSchema.parse(
-  //   JSON.parse(await fs.readFile(metadataFile.path, "utf8")),
-  // );
+  const metadata = expoMetadataSchema.parse(
+    JSON.parse(await fs.readFile(metadataFile.path, "utf8")),
+  );
   const expoConfig = expoConfigSchema.parse(
     JSON.parse(await fs.readFile(expoConfigFile.path, "utf8")),
   );
@@ -30,11 +29,13 @@ export async function createDeploymentWithFileList(
   const runtimeVersion = expoConfig.runtimeVersion;
 
   const res = await db
-    .insert(deployment)
+    .insert(deployments)
     .values({
       projectId,
       userId,
       runtimeVersion,
+      metadata,
+      expoConfig,
     })
     .returning();
 
