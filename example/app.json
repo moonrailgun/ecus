@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "example",
-    "slug": "example",
+    "name": "ECUS Example",
+    "slug": "ecus-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.moonrailgun.example"
+      "bundleIdentifier": "com.moonrailgun.ecus.example"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.moonrailgun.example"
+      "package": "com.moonrailgun.ecus.example"
     },
     "web": {
       "bundler": "metro",
@@ -27,7 +27,7 @@
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 30000,
-      "url": "http://localhost:3000/api/1/manifest"
+      "url": "http://localhost:5433/api/mxcv71ljj1l4elkqu0crv3i3/manifest"
     },
     "runtimeVersion": "1",
     "plugins": [
