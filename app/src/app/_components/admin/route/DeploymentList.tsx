@@ -29,11 +29,6 @@ const fields = [
       width: 160,
     },
   }),
-  createReferenceField("branchId", {
-    label: "Branch",
-    reference: "branch",
-    displayField: "name",
-  }),
   createCustomField("id", {
     label: "Status",
     render: (id, record) => {

@@ -90,19 +90,20 @@ export async function GET(
   try {
     if (activeDeployment.deploymentId) {
       // its should be normal update
-      const res = await db
+      const matchedDeployments = await db
         .select()
         .from(deployments)
         .where(eq(deployments.id, activeDeployment.deploymentId))
         .limit(1);
 
-      if (!res[0]) {
+      const deployment = matchedDeployments[0];
+      if (!deployment) {
         throw new Error("Not found target deployment");
       }
 
       return await putUpdateInResponseAsync(
         request,
-        res[0],
+        deployment,
         runtimeVersion,
         platform,
         protocolVersion,

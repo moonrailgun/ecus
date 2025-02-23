@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { env } from "@/env";
+import { cacheManager } from "@/server/cache";
 import { db } from "@/server/db";
 import { activeDeployments, deployments } from "@/server/db/schema";
 import { getFileMetadata } from "@/server/file/client";
-import {
-  buildDeploymentKey,
-  buildDeploymentManifestPath,
-} from "@/server/file/helper";
+import { buildDeploymentManifestPath } from "@/server/file/helper";
 import crypto, { type BinaryToTextEncoding } from "crypto";
 import { and, eq, InferSelectModel } from "drizzle-orm";
-import fsSync from "fs";
 import fs from "fs/promises";
 import mime from "mime";
 import path from "path";
@@ -141,6 +138,13 @@ type GetAssetMetadataArg =
     };
 
 export async function getAssetMetadataFromS3(arg: GetAssetMetadataFromS3Arg) {
+  const cacheKey = `asset:metadata:${arg.key}`;
+  const cache = await cacheManager.get<string>(cacheKey);
+
+  if (cache) {
+    return JSON.parse(cache);
+  }
+
   const res = await getFileMetadata(arg.key);
 
   const keyExtensionSuffix = arg.isLaunchAsset ? "bundle" : arg.ext;
@@ -148,7 +152,7 @@ export async function getAssetMetadataFromS3(arg: GetAssetMetadataFromS3Arg) {
     ? "application/javascript"
     : mime.getType(arg.ext);
 
-  return {
+  const ret = {
     hash: res.hash,
     key: res.key,
     fileExtension: `.${keyExtensionSuffix}`,
@@ -157,6 +161,10 @@ export async function getAssetMetadataFromS3(arg: GetAssetMetadataFromS3Arg) {
     // url: `${env.S3_PUBLIC_HOST}/api/assets?asset=${assetFilePath}&runtimeVersion=${arg.runtimeVersion}&platform=${arg.platform}`,
     url: `${env.S3_PUBLIC_HOST}/${arg.key}`,
   };
+
+  await cacheManager.set(cacheKey, JSON.stringify(ret));
+
+  return ret;
 }
 
 /**

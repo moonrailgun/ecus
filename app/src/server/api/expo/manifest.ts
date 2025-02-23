@@ -56,11 +56,9 @@ export async function putUpdateInResponseAsync(
   }
 
   const platformSpecificMetadata = metadata.fileMetadata[platform];
-  const manifest = {
-    id: deployment.id,
-    createdAt: deployment.createdAt,
-    runtimeVersion,
-    assets: await Promise.all(
+
+  const [assets, launchAsset] = await Promise.all([
+    await Promise.all(
       platformSpecificMetadata.assets.map((asset) =>
         getAssetMetadataFromS3({
           deployment,
@@ -72,7 +70,7 @@ export async function putUpdateInResponseAsync(
         }),
       ),
     ),
-    launchAsset: await getAssetMetadataFromS3({
+    await getAssetMetadataFromS3({
       deployment,
       key: `${buildDeploymentKey(deployment.projectId, deployment.id)}/${platformSpecificMetadata.bundle}`,
       isLaunchAsset: true,
@@ -80,6 +78,14 @@ export async function putUpdateInResponseAsync(
       platform,
       ext: null,
     }),
+  ]);
+
+  const manifest = {
+    id: deployment.id,
+    createdAt: deployment.createdAt,
+    runtimeVersion,
+    assets,
+    launchAsset,
     metadata: {},
     extra: {
       expoClient: expoConfig,
