@@ -19,7 +19,7 @@ import {
 } from "@/server/api/expo/helper";
 import { serializeDictionary } from "structured-headers";
 import { InferModel, InferSelectModel } from "drizzle-orm";
-import { deployments } from "@/server/db/schema";
+import { activeDeployments, deployments } from "@/server/db/schema";
 import { buildDeploymentKey } from "@/server/file/helper";
 
 export enum UpdateType {
@@ -38,6 +38,7 @@ export async function getTypeOfUpdateAsync(
 
 export async function putUpdateInResponseAsync(
   request: NextRequest,
+  activeDeployment: InferSelectModel<typeof activeDeployments>,
   deployment: InferSelectModel<typeof deployments>,
   runtimeVersion: string,
   platform: "ios" | "android",
@@ -81,8 +82,8 @@ export async function putUpdateInResponseAsync(
   ]);
 
   const manifest = {
-    id: deployment.id,
-    createdAt: deployment.createdAt,
+    id: activeDeployment.updateId ?? deployment.id,
+    createdAt: activeDeployment.updatedAt ?? deployment.createdAt,
     runtimeVersion,
     assets,
     launchAsset,

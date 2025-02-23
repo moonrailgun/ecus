@@ -157,6 +157,7 @@ export const activeDeployments = createTable(
     runtimeVersion: varchar("runtime_version", { length: 255 }).notNull(),
     branchId: varchar("branch_id", { length: 255 }).notNull(),
     deploymentId: uuid("deployment_id"),
+    updateId: uuid("update_id").$onUpdate(() => sql`gen_random_uuid()`), // this design is for make sure every time active deployment is update, its can be trigger update in client.
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

@@ -103,6 +103,7 @@ export async function GET(
 
       return await putUpdateInResponseAsync(
         request,
+        activeDeployment,
         deployment,
         runtimeVersion,
         platform,
