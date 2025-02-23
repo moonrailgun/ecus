@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     color: "#0a7ea4",
   },
   tiny: {
-    fontSize: 9,
+    lineHeight: 16,
+    fontSize: 12,
   },
 });

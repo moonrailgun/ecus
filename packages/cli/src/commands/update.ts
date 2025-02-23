@@ -49,6 +49,6 @@ export const updateCommand: CommandModule = {
 
     console.log(chalk.green("You can check this dir to get result:", tmpzip));
     const stat = await fs.stat(tmpzip);
-    console.log("filesize:", chalk.bgGreen(fileSize(stat.size)));
+    console.log("JS Bundle Size:", chalk.bgGreen(fileSize(stat.size)));
   },
 };
