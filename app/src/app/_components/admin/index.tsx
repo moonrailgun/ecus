@@ -9,7 +9,7 @@ import { DeploymentCreate } from "./route/DeploymentCreate";
 import { DeploymentList } from "./route/DeploymentList";
 import { ClientRedirect } from "../Redirect";
 import { ActiveList } from "./route/ActiveList";
-import { AdminGlobalModal } from "../AdminGlobalModal";
+import { AdminGlobalModal } from "./AdminGlobalModal";
 import { Navbar } from "./Navbar";
 
 const dataProvider = jsonServerProvider("/api/admin");

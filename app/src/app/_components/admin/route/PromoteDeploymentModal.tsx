@@ -10,7 +10,7 @@ import {
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 import { toast } from "sonner";
-import { closeModal } from "../../AdminGlobalModal";
+import { closeModal } from "../AdminGlobalModal";
 
 interface Props {
   deploymentId: string;

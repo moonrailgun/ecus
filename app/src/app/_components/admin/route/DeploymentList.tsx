@@ -16,7 +16,7 @@ import { IconPlus } from "tushan/icon";
 import { first, get } from "lodash-es";
 import { RemoteFileViewer } from "../../RemoteFileViewer";
 import { PromoteDeploymentModal } from "./PromoteDeploymentModal";
-import { openModal } from "../../AdminGlobalModal";
+import { openModal } from "../AdminGlobalModal";
 import { DeploymentStatus } from "./DeploymentStatusField";
 
 const fields = [
