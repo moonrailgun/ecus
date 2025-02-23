@@ -7,6 +7,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -174,9 +175,7 @@ export const activeDeployments = createTable(
 );
 
 export const deployments = createTable("deployment", {
-  id: varchar("id", { length: 255 })
-    .primaryKey()
-    .$defaultFn(() => createCuid()),
+  id: uuid("id").primaryKey().defaultRandom().notNull(),
   userId: varchar("user_id", { length: 255 }).notNull(),
   projectId: varchar("project_id", { length: 255 }).notNull(),
   runtimeVersion: varchar("runtime_version", { length: 255 }),
