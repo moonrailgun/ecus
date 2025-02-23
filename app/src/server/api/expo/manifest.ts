@@ -151,7 +151,7 @@ export async function putUpdateInResponseAsync(
 
 export async function putRollBackInResponseAsync(
   request: NextRequest,
-  updateBundlePath: string,
+  activeDeployment: InferSelectModel<typeof activeDeployments>,
   protocolVersion: number,
 ): Promise<Response> {
   if (protocolVersion === 0) {
@@ -172,7 +172,9 @@ export async function putRollBackInResponseAsync(
     throw new NoUpdateAvailableError();
   }
 
-  const directive = await createRollBackDirectiveAsync(updateBundlePath);
+  const directive = await createRollBackDirectiveAsync(
+    activeDeployment.updatedAt ?? activeDeployment.createdAt,
+  );
 
   let signature = null;
   if (expectSignatureHeader) {

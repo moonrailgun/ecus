@@ -189,19 +189,13 @@ export async function getAssetMetadataAsync(arg: GetAssetMetadataArg) {
   };
 }
 
-export async function createRollBackDirectiveAsync(updateBundlePath: string) {
-  try {
-    const rollbackFilePath = `${updateBundlePath}/rollback`;
-    const rollbackFileStat = await fs.stat(rollbackFilePath);
-    return {
-      type: "rollBackToEmbedded",
-      parameters: {
-        commitTime: new Date(rollbackFileStat.birthtime).toISOString(),
-      },
-    };
-  } catch (error) {
-    throw new Error(`No rollback found. Error: ${String(error)}`);
-  }
+export async function createRollBackDirectiveAsync(commitTime: Date) {
+  return {
+    type: "rollBackToEmbedded",
+    parameters: {
+      commitTime: commitTime.toISOString(),
+    },
+  };
 }
 
 export async function createNoUpdateAvailableDirectiveAsync() {

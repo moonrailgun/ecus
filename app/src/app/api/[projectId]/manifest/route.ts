@@ -111,20 +111,10 @@ export async function GET(
       );
     } else {
       // its should be rollback action
-      // TODO
-      // return await putRollBackInResponseAsync(
-      //   request,
-      //   updateBundlePath,
-      //   protocolVersion,
-      // );
-
-      return Response.json(
-        {
-          error: "not implement yet",
-        },
-        {
-          status: 404,
-        },
+      return await putRollBackInResponseAsync(
+        request,
+        activeDeployment,
+        protocolVersion,
       );
     }
   } catch (error) {
