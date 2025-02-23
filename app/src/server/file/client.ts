@@ -69,8 +69,12 @@ export async function getFileMetadata(key: string) {
 
   const res = await s3Client.send(command);
 
+  const hash = res.ChecksumSHA256?.replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, ""); // make sure to handle with `base64url-encoded`
+
   return {
     key: res.ETag,
-    hash: res.ChecksumSHA256,
+    hash,
   };
 }

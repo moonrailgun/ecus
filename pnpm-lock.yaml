@@ -314,9 +314,6 @@ importers:
       '@types/adm-zip':
         specifier: ^0.5.7
         version: 0.5.7
-      '@types/fs-extra':
-        specifier: ^9.0.13
-        version: 9.0.13
       '@types/glob':
         specifier: ^8.0.0
         version: 8.1.0
@@ -1592,7 +1589,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.16':
     resolution: {integrity: sha512-a8Ulbnji9kFatnOtsWGCRs6nMUj9UNC0/WhE74HQdXGDGMn5Pl8eNe3cLMy9G54DdqAmEZmRZpgXmcudT78fEQ==}
@@ -2638,9 +2635,6 @@ packages:
 
   '@types/fs-extra@11.0.4':
     resolution: {integrity: sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==}
-
-  '@types/fs-extra@9.0.13':
-    resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
 
   '@types/glob@8.1.0':
     resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==}
@@ -10942,10 +10936,6 @@ snapshots:
       '@types/jsonfile': 6.1.4
       '@types/node': 20.17.19
     optional: true
-
-  '@types/fs-extra@9.0.13':
-    dependencies:
-      '@types/node': 20.17.19
 
   '@types/glob@8.1.0':
     dependencies:

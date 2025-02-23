@@ -116,13 +116,14 @@ export async function putUpdateInResponseAsync(
   }
 
   const assetRequestHeaders: Record<string, object> = {};
-  [...manifest.assets, manifest.launchAsset].forEach((asset) => {
-    if (asset.key) {
-      assetRequestHeaders[asset.key] = {
-        "test-header": "test-header-value",
-      };
-    }
-  });
+  // TODO: not need yet
+  // [...manifest.assets, manifest.launchAsset].forEach((asset) => {
+  //   if (asset.key) {
+  //     assetRequestHeaders[asset.key] = {
+  //       "test-header": "test-header-value",
+  //     };
+  //   }
+  // });
 
   const form = new FormData();
   form.append("manifest", JSON.stringify(manifest), {

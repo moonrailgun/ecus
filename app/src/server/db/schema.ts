@@ -156,9 +156,7 @@ export const activeDeployments = createTable(
     projectId: varchar("project_id", { length: 255 }).notNull(),
     runtimeVersion: varchar("runtime_version", { length: 255 }).notNull(),
     branchId: varchar("branch_id", { length: 255 }).notNull(),
-    deploymentId: varchar("deployment_id", {
-      length: 255,
-    }),
+    deploymentId: uuid("deployment_id"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
