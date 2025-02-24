@@ -15,6 +15,7 @@ import { type AdapterAccount } from "next-auth/adapters";
 import { createId as createCuid } from "@paralleldrive/cuid2";
 import { z } from "zod";
 import { expoConfigSchema, expoMetadataSchema } from "../api/expo/schema";
+import { generateRandomSHA256 } from "../utils";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -36,6 +37,9 @@ export const users = createTable("user", {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
+  apiKey: varchar("api_key", { length: 255 }).$defaultFn(() =>
+    generateRandomSHA256(Date.now().toString()),
+  ),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
