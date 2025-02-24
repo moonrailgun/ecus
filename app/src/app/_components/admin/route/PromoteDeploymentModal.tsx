@@ -25,14 +25,14 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
   const trpcUtils = api.useUtils();
 
   const [handleSubmit, isLoading] = useEventWithLoading(async (values) => {
-    if (!values.channel) {
+    if (!values.channelId) {
       toast.error("Channel is necessary.");
       return;
     }
 
     await promoteMutation.mutateAsync({
       projectId,
-      channelId: values.channel,
+      channelId: values.channelId,
       runtimeVersion,
       deploymentId,
     });
