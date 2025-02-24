@@ -3,7 +3,7 @@
 import { env } from "@/env";
 import { cacheManager } from "@/server/cache";
 import { db } from "@/server/db";
-import { activeDeployments, deployments } from "@/server/db/schema";
+import { activeDeployments, channel, deployments } from "@/server/db/schema";
 import { getFileMetadata } from "@/server/file/client";
 import { buildDeploymentManifestPath } from "@/server/file/helper";
 import crypto, { type BinaryToTextEncoding } from "crypto";
@@ -60,7 +60,19 @@ export async function getPrivateKeyAsync() {
 export async function getRuntimeVersionActiveDeployment(
   projectId: string,
   runtimeVersion: string,
+  channelName: string | null,
 ) {
+  let channelId = "";
+  if (channelName) {
+    channelId = await db
+      .select()
+      .from(channel)
+      .where(
+        and(eq(channel.projectId, projectId), eq(channel.name, channelName)),
+      )
+      .then((d) => d[0]?.id ?? "");
+  }
+
   const res = await db
     .select()
     .from(activeDeployments)
@@ -68,6 +80,7 @@ export async function getRuntimeVersionActiveDeployment(
       and(
         eq(activeDeployments.runtimeVersion, runtimeVersion),
         eq(activeDeployments.projectId, projectId),
+        channelId ? eq(activeDeployments.channelId, channelId) : undefined,
       ),
     )
     .limit(1);

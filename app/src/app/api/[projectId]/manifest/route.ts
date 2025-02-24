@@ -29,6 +29,7 @@ export async function GET(
   const protocolVersionMaybeArray = request.headers.get(
     "expo-protocol-version",
   );
+  const channelName = request.headers.get("expo-channel-name");
 
   if (protocolVersionMaybeArray && Array.isArray(protocolVersionMaybeArray)) {
     return Response.json(
@@ -73,6 +74,7 @@ export async function GET(
   const activeDeployment = await getRuntimeVersionActiveDeployment(
     projectId,
     runtimeVersion,
+    channelName,
   );
 
   if (!activeDeployment) {

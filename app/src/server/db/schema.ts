@@ -146,7 +146,7 @@ export const channel = createTable(
     ),
   },
   (c) => ({
-    uniq: uniqueIndex("project_channel_idx").on(c.projectId, c.name),
+    uniq: uniqueIndex("project_channel_name_idx").on(c.projectId, c.name),
   }),
 );
 
