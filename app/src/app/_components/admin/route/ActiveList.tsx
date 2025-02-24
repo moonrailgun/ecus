@@ -11,9 +11,9 @@ import { useAdminStore } from "../useAdminStore";
 const fields = [
   createTextField("projectId"),
   createTextField("runtimeVersion"),
-  createReferenceField("branchId", {
-    label: "Branch",
-    reference: "branch",
+  createReferenceField("channelId", {
+    label: "Channel",
+    reference: "channel",
     displayField: "name",
   }),
   createReferenceField("deploymentId", {

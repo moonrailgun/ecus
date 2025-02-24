@@ -25,14 +25,14 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
   const trpcUtils = api.useUtils();
 
   const [handleSubmit, isLoading] = useEventWithLoading(async (values) => {
-    if (!values.branchId) {
-      toast.error("Branch is necessary.");
+    if (!values.channel) {
+      toast.error("Channel is necessary.");
       return;
     }
 
     await promoteMutation.mutateAsync({
       projectId,
-      branchId: values.branchId,
+      channelId: values.channel,
       runtimeVersion,
       deploymentId,
     });
@@ -60,10 +60,10 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
         <Form.Item label="Runtime Version">
           <div>{props.runtimeVersion}</div>
         </Form.Item>
-        <Form.Item label="Branch" field="branchId">
+        <Form.Item label="Channel" field="channelId">
           {/* @ts-ignore */}
           <ReferenceFieldEdit
-            options={{ reference: "branch", displayField: "name" }}
+            options={{ reference: "channel", displayField: "name" }}
           />
         </Form.Item>
         <Form.Item>

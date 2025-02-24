@@ -30,7 +30,7 @@ export const DeploymentStatus: React.FC<DeploymentStatusProps> = React.memo(
         {activeDeployment?.map((ad, i) => (
           <div key={i}>
             <Tag color="arcoblue">
-              {ad.branch?.name} <IconArrowUp />
+              {ad.channel?.name} <IconArrowUp />
             </Tag>
           </div>
         ))}

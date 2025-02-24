@@ -7,6 +7,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -129,23 +130,29 @@ export const projectRelations = relations(project, ({ many }) => ({
   deployments: many(deployments),
 }));
 
-export const branch = createTable("branch", {
-  id: varchar("id", { length: 255 })
-    .primaryKey()
-    .$defaultFn(() => createCuid()),
-  projectId: varchar("project_id", { length: 255 }).notNull(),
-  name: varchar("name", { length: 255 }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
-  ),
-});
+export const channel = createTable(
+  "channel",
+  {
+    id: varchar("id", { length: 255 })
+      .primaryKey()
+      .$defaultFn(() => createCuid()),
+    projectId: varchar("project_id", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (c) => ({
+    uniq: uniqueIndex("project_channel_idx").on(c.projectId, c.name),
+  }),
+);
 
-export const branchRelations = relations(branch, ({ one, many }) => ({
+export const channelRelations = relations(channel, ({ one }) => ({
   project: one(project, {
-    fields: [branch.projectId],
+    fields: [channel.projectId],
     references: [project.id],
   }),
 }));
@@ -155,7 +162,7 @@ export const activeDeployments = createTable(
   {
     projectId: varchar("project_id", { length: 255 }).notNull(),
     runtimeVersion: varchar("runtime_version", { length: 255 }).notNull(),
-    branchId: varchar("branch_id", { length: 255 }).notNull(),
+    channelId: varchar("channel_id", { length: 255 }).notNull(),
     deploymentId: uuid("deployment_id"),
     updateId: uuid("update_id").$onUpdate(() => sql`gen_random_uuid()`), // this design is for make sure every time active deployment is update, its can be trigger update in client.
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -168,7 +175,7 @@ export const activeDeployments = createTable(
   (ad) => ({
     compoundKey: primaryKey({
       name: "active_deployment_pk",
-      columns: [ad.projectId, ad.runtimeVersion, ad.branchId],
+      columns: [ad.projectId, ad.runtimeVersion, ad.channelId],
     }),
   }),
 );
@@ -178,12 +185,12 @@ export const deployments = createTable("deployment", {
   userId: varchar("user_id", { length: 255 }).notNull(),
   projectId: varchar("project_id", { length: 255 }).notNull(),
   runtimeVersion: varchar("runtime_version", { length: 255 }),
-  expoConfig: jsonb("expo_config")
-    .notNull()
-    .$type<z.infer<typeof expoConfigSchema>>(),
   metadata: jsonb("metadata")
     .notNull()
     .$type<z.infer<typeof expoMetadataSchema>>(),
+  expoConfig: jsonb("expo_config")
+    .notNull()
+    .$type<z.infer<typeof expoConfigSchema>>(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

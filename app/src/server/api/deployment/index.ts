@@ -28,6 +28,10 @@ export async function createDeploymentAndUploadFiles(
     JSON.parse(await fs.readFile(expoConfigFile.path, "utf8")),
   );
 
+  if (typeof expoConfig.runtimeVersion !== "string") {
+    throw new Error("runtimeVersion should be only string");
+  }
+
   const runtimeVersion = expoConfig.runtimeVersion;
 
   return await db.transaction(async (tx) => {

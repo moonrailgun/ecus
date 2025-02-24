@@ -1,6 +1,6 @@
 import {
   activeDeployments,
-  branch,
+  channel,
   deployments,
   users,
 } from "@/server/db/schema";
@@ -10,5 +10,5 @@ export const resourceMap: Record<string, PgTable> = {
   user: users,
   deployment: deployments,
   active: activeDeployments,
-  branch: branch,
+  channel: channel,
 };
