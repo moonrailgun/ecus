@@ -4,7 +4,7 @@ import { users } from "@/server/db/schema";
 import { generateRandomSHA256 } from "@/server/utils";
 import { eq } from "drizzle-orm";
 
-export const projectRouter = createTRPCRouter({
+export const userRouter = createTRPCRouter({
   getApiKey: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
     const res = await db.query.users.findFirst({
@@ -13,7 +13,7 @@ export const projectRouter = createTRPCRouter({
 
     return res?.apiKey;
   }),
-  updateApiKey: protectedProcedure.query(async ({ ctx }) => {
+  updateApiKey: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.session.user.id;
     const res = await db
       .update(users)

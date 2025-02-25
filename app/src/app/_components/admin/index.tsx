@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { jsonServerProvider, Resource, Tushan, LoadingView } from "tushan";
+import {
+  jsonServerProvider,
+  Resource,
+  Tushan,
+  LoadingView,
+  CustomRoute,
+} from "tushan";
 import { useSession } from "next-auth/react";
 import { IconCompass, IconList, IconWifi } from "tushan/icon";
 import React from "react";
@@ -12,6 +18,7 @@ import { ActiveList } from "./route/ActiveList";
 import { AdminGlobalModal } from "./AdminGlobalModal";
 import { Navbar } from "./Navbar";
 import { ChannelList } from "./route/ChannelList";
+import { ApikeyPage } from "./route/ApikeyPage";
 
 const dataProvider = jsonServerProvider("/api/admin");
 
@@ -61,6 +68,9 @@ export const Admin = React.memo(() => {
         icon={<IconList />}
         list={<ChannelList />}
       />
+      <CustomRoute name="apikey" noMenu={true}>
+        <ApikeyPage />
+      </CustomRoute>
       <AdminGlobalModal />
     </Tushan>
   );
