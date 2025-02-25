@@ -1,11 +1,18 @@
 import { createCache } from "cache-manager";
 import { Keyv } from "keyv";
+import KeyvRedis from "@keyv/redis";
 import { CacheableMemory } from "cacheable";
+
+import { env } from "@/env";
 
 export const cacheManager = createCache({
   stores: [
-    new Keyv({
-      store: new CacheableMemory({ ttl: 60_000, lruSize: 5000 }),
-    }),
+    env.REDIS_URL
+      ? new Keyv({
+          store: new KeyvRedis(env.REDIS_URL),
+        })
+      : new Keyv({
+          store: new CacheableMemory({ ttl: 60_000, lruSize: 5000 }),
+        }),
   ],
 });

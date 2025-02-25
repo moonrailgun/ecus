@@ -23,6 +23,7 @@
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
     "@aws-sdk/client-s3": "^3.749.0",
+    "@keyv/redis": "^4.2.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tailwindcss/postcss": "^4.0.7",

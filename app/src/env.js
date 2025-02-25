@@ -17,6 +17,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: z.string(),
     AUTH_GITHUB_ORGANIZATION: z.string().optional(),
     DATABASE_URL: z.string().url(),
+    REDIS_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -48,6 +49,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     AUTH_GITHUB_ORGANIZATION: process.env.AUTH_GITHUB_ORGANIZATION,
     DATABASE_URL: process.env.DATABASE_URL,
+    REDIS_URL: process.env.REDIS_URL,
     NODE_ENV: process.env.NODE_ENV,
     S3_PUBLIC_HOST: process.env.S3_PUBLIC_HOST,
     S3_ENDPOINT: process.env.S3_ENDPOINT,
