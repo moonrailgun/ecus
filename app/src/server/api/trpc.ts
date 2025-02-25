@@ -11,7 +11,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { auth } from "@/server/auth";
+import { auth, getSession } from "@/server/auth";
 import { db } from "@/server/db";
 import { getUserInfoWithApikey } from "../cache/user";
 import { Session } from "next-auth";
@@ -29,29 +29,7 @@ import { Session } from "next-auth";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const authorization = opts.headers.get("Authorization");
-
-  let session: Session | null = null;
-  if (authorization) {
-    const apiKey = authorization.replace("Bearer ", "");
-    const userInfo = await getUserInfoWithApikey(apiKey);
-
-    if (userInfo) {
-      session = {
-        expires: "",
-        user: {
-          id: userInfo.id,
-          name: userInfo.name,
-          email: userInfo.email,
-          image: userInfo.image,
-        },
-      };
-    } else {
-      session = await auth();
-    }
-  } else {
-    session = await auth();
-  }
+  const session = await getSession(opts.headers);
 
   return {
     db,

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "@/server/auth";
+import { auth, getSession } from "@/server/auth";
 import { processZipFile } from "@/server/file/utils";
 import { createDeploymentAndUploadFiles } from "@/server/api/deployment";
 
@@ -7,7 +7,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ projectId: string }> },
 ) {
-  const session = await auth();
+  const session = await getSession(request.headers);
 
   if (!session) {
     return NextResponse.json(
@@ -26,6 +26,8 @@ export async function PUT(
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const name = (formData.get("name") as string) ?? file.name;
+
+    console.log("file", file.type);
 
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });

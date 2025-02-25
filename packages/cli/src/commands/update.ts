@@ -1,54 +1,50 @@
 import { CommandModule } from "yargs";
-import { $, echo, chalk, fs } from "zx";
-import os from "os";
-import path from "path";
-import AdmZip from "adm-zip";
-import prettyMilliseconds from "pretty-ms";
-import fileSize from "filesize";
-import * as ExpoConfig from "@expo/config";
+import { bundleJsPackage } from "../utils/bundle";
+import got, { RequestError } from "got";
+import { getFileConfig } from "../utils/config";
+import { chalk, fs, path } from "zx";
+import FormData from "form-data";
+import _ from "lodash";
 
 export const updateCommand: CommandModule = {
   command: "update",
   describe: "create a update and upload",
   builder: undefined,
-  async handler(args) {
-    const tmpdir = path.join(os.tmpdir(), `./ecus/${Date.now()}`);
-    const tmpzip = `${tmpdir}.zip`;
-    await fs.mkdirp(tmpdir);
-
-    console.log(chalk.blue("Start to export js bundle with `expo export`:"));
-    const buildStart = Date.now();
-
-    const e = $`npx expo export`;
-    for await (const chunk of e.stdout) {
-      echo(chunk);
+  async handler() {
+    const config = await getFileConfig();
+    if (!config.url || !config.apikey || !config.projectId) {
+      console.log(chalk.red("Please run `ecus init` before."));
+      return;
     }
 
-    console.log(
-      chalk.blue(
-        "Bundle js completed, usage:",
-        prettyMilliseconds(Date.now() - buildStart),
-      ),
-    );
+    const zipPath = await bundleJsPackage();
+    const buffer = await fs.readFile(zipPath);
 
-    const { exp: config } = ExpoConfig.getConfig("./", {
-      skipSDKVersionRequirement: true,
-      isPublicConfig: true,
-    });
+    const form = new FormData();
+    form.append("file", buffer, "tmp.zip");
 
-    console.log("expo config:", config);
-    fs.writeJSON(path.join(tmpdir, "./expoConfig.json"), config);
+    console.log("Uploading to remote:", config.url);
+    try {
+      const res = await got.put(
+        `${config.url}/api/${config.projectId}/upload`,
+        {
+          headers: {
+            Authorization: `Bearer ${config.apikey}`,
+          },
+          body: form,
+        },
+      );
 
-    await $`cp -r ./dist/ ${tmpdir}`;
+      console.log(
+        "Uploaded completed, deployment id:",
+        _.get(JSON.parse(res.body), "id"),
+      );
+    } catch (err) {
+      if (err instanceof RequestError) {
+        console.log(err.response?.body);
+      }
 
-    const zip = new AdmZip();
-    zip.addLocalFolder(tmpdir);
-    await zip.writeZipPromise(tmpzip);
-
-    await fs.remove(tmpdir);
-
-    console.log(chalk.green("You can check this dir to get result:", tmpzip));
-    const stat = await fs.stat(tmpzip);
-    console.log("JS Bundle Size:", chalk.bgGreen(fileSize(stat.size)));
+      throw err;
+    }
   },
 };

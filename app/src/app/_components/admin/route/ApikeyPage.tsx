@@ -4,11 +4,13 @@ import { Button, Card, Input, Typography, useEvent } from "tushan";
 import { IconCopy, IconRefresh } from "tushan/icon";
 import copy from "copy-to-clipboard";
 import { toast } from "sonner";
+import { useAdminStore } from "../useAdminStore";
 
 export const ApikeyPage: React.FC = React.memo(() => {
   const { data: apikey } = api.user.getApiKey.useQuery();
   const updateApikeyMutation = api.user.updateApiKey.useMutation();
   const trpcUtils = api.useUtils();
+  const projectId = useAdminStore((state) => state.projectId);
 
   const handleCopy = useEvent(() => {
     copy(apikey ?? "");
@@ -21,7 +23,7 @@ export const ApikeyPage: React.FC = React.memo(() => {
     toast("Regenerated!");
   });
 
-  const command = `ecus init --apikey ${apikey}`;
+  const command = `ecus init --url ${location.origin} --projectId ${projectId} --apikey ${apikey}`;
 
   return (
     <Card>
