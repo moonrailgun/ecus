@@ -10,6 +10,7 @@ import {
   verificationTokens,
 } from "@/server/db/schema";
 import { env } from "@/env";
+import { get } from "lodash-es";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -91,7 +92,8 @@ export const authConfig = {
           const orgs = await response.json();
 
           const isMember = orgs.some(
-            (org: any) => org.login === env.AUTH_GITHUB_ORGANIZATION,
+            (org: unknown) =>
+              get(org, "login") === env.AUTH_GITHUB_ORGANIZATION,
           );
           if (isMember) {
             return true;

@@ -1,6 +1,11 @@
 "use client";
 
-import { Admin } from "@/app/_components/admin";
+import dynamic from "next/dynamic";
+
+const Admin = dynamic(
+  () => import("@/app/_components/admin").then((m) => m.Admin),
+  { ssr: false },
+);
 
 export default function Page() {
   return <Admin />;

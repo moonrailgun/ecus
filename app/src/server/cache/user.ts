@@ -10,6 +10,7 @@ export async function getUserInfoWithApikey(
   const cache = await cacheManager.get<string>(cacheKey);
 
   if (cache) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return JSON.parse(cache);
   }
 
@@ -17,7 +18,7 @@ export async function getUserInfoWithApikey(
     where: eq(users.apiKey, apiKey),
   });
 
-  cacheManager.set(cacheKey, JSON.stringify(user));
+  void cacheManager.set(cacheKey, JSON.stringify(user));
 
   return user;
 }

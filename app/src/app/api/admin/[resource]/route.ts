@@ -1,5 +1,5 @@
 import { db } from "@/server/db";
-import { count, desc, eq, sql, SQL } from "drizzle-orm";
+import { count, desc, eq, sql, type SQL } from "drizzle-orm";
 import { get } from "lodash-es";
 import { type NextRequest, NextResponse } from "next/server";
 import { resourceMap } from "./_resource";
@@ -40,6 +40,7 @@ export async function GET(
         .where(where)
         .limit(end - start)
         .offset(start)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .orderBy(desc((table as any).createdAt ?? (table as any).id)),
       db.select({ count: count() }).from(table).where(where),
     ]);

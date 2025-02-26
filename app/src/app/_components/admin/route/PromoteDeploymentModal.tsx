@@ -37,7 +37,7 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
       deploymentId,
     });
 
-    trpcUtils.deployment.activeDeployment.invalidate({
+    void trpcUtils.deployment.activeDeployment.invalidate({
       projectId,
       runtimeVersion,
     });

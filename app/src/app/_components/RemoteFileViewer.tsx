@@ -37,11 +37,12 @@ export const RemoteFileViewer: React.FC<RemoteFileViewerProps> = React.memo(
         return;
       }
 
-      fetchContent(url);
+      await fetchContent(url);
     });
 
     const json = useMemo(() => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return JSON.parse(content);
       } catch {
         return String(content);

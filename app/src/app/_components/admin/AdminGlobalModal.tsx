@@ -27,7 +27,7 @@ interface UseModalStoreState {
   modalComponent: React.ReactNode;
 }
 
-export const useModalStore = create<UseModalStoreState>((set) => ({
+export const useModalStore = create<UseModalStoreState>(() => ({
   modalComponent: null,
 }));
 

@@ -70,12 +70,12 @@ const drawerFields = [
         <Tabs>
           <Tabs.TabPane key="meta" title="Metadata" lazyload>
             <RemoteFileViewer
-              url={`/api/${projectId}/updates/${id}/metadata.json`}
+              url={`/api/${projectId}/updates/${String(id)}/metadata.json`}
             />
           </Tabs.TabPane>
           <Tabs.TabPane key="expo" title="Expo" lazyload>
             <RemoteFileViewer
-              url={`/api/${projectId}/updates/${id}/expoConfig.json`}
+              url={`/api/${projectId}/updates/${String(id)}/expoConfig.json`}
             />
           </Tabs.TabPane>
         </Tabs>

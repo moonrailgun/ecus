@@ -31,7 +31,7 @@ export async function GET(
 
     return new Response(body as ReadableStream, {
       headers: {
-        "Content-Type": contentType || "application/octet-stream",
+        "Content-Type": contentType ?? "application/octet-stream",
       },
     });
   } catch (error) {

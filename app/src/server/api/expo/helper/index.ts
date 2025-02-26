@@ -103,7 +103,7 @@ export async function getLatestUpdateBundlePathForRuntimeVersionAsync(
     )
     .limit(1);
 
-  if (!deployments || !deployments[0] || !deployments[0]!.deploymentId) {
+  if (!deployments?.[0]?.deploymentId) {
     throw new Error("Unsupported runtime version");
   }
 
@@ -155,6 +155,7 @@ export async function getAssetMetadataFromS3(arg: GetAssetMetadataFromS3Arg) {
   const cache = await cacheManager.get<string>(cacheKey);
 
   if (cache) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return JSON.parse(cache);
   }
 
