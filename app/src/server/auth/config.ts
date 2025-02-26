@@ -98,6 +98,7 @@ export const authConfig = {
           if (isMember) {
             return true;
           } else {
+            console.log("Failed to signin, orgs:", orgs);
             return false;
           }
         } catch (error) {
