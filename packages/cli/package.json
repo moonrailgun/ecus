@@ -1,6 +1,6 @@
 {
   "name": "ecus-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Command line interface of ECUS",
   "bin": {
     "ecus": "./bin/cli"
@@ -24,7 +24,14 @@
     "url": "git+https://github.com/moonrailgun/ecus.git"
   },
   "keywords": [
-    "ecus"
+    "ecus",
+    "expo",
+    "hotfix",
+    "react native",
+    "reactnative",
+    "custom",
+    "opensource",
+    "free"
   ],
   "author": "moonrailgun",
   "license": "MIT",
@@ -38,6 +45,7 @@
     "crypto-random-string": "3.3.1",
     "dotenv": "^16.0.0",
     "filesize": "^8.0.7",
+    "form-data": "^4.0.2",
     "glob": "^8.1.0",
     "got": "11.8.5",
     "inquirer": "^8.2.2",

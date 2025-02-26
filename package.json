@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cd app && pnpm dev"
+    "dev": "cd app && pnpm dev",
+    "release:packages": "pnpm -r --filter \"./packages/*\" publish --registry=https://registry.npmjs.com/"
   },
   "pnpm": {
     "overrides": {
