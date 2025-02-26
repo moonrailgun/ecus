@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { auth, getSession } from "@/server/auth";
+import { getSession } from "@/server/auth";
 import { processZipFile } from "@/server/file/utils";
 import { createDeploymentAndUploadFiles } from "@/server/api/deployment";
+import { z } from "zod";
+import { gitInfoSchema } from "@/server/api/expo/schema";
 
 export async function PUT(
   request: NextRequest,
@@ -26,6 +28,9 @@ export async function PUT(
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const name = (formData.get("name") as string) ?? file.name;
+    const gitInfo: z.infer<typeof gitInfoSchema> = JSON.parse(
+      (formData.get("gitInfo") as string) ?? "{}",
+    );
 
     console.log("file", file.type);
 
@@ -67,6 +72,7 @@ export async function PUT(
       projectId,
       session.user.id,
       filelist,
+      gitInfo,
     );
 
     return NextResponse.json({

@@ -14,7 +14,11 @@ import {
 import { type AdapterAccount } from "next-auth/adapters";
 import { createId as createCuid } from "@paralleldrive/cuid2";
 import { z } from "zod";
-import { expoConfigSchema, expoMetadataSchema } from "../api/expo/schema";
+import {
+  expoConfigSchema,
+  expoMetadataSchema,
+  gitInfoSchema,
+} from "../api/expo/schema";
 import { generateRandomSHA256 } from "../utils";
 
 /**
@@ -195,6 +199,7 @@ export const deployments = createTable("deployment", {
   expoConfig: jsonb("expo_config")
     .notNull()
     .$type<z.infer<typeof expoConfigSchema>>(),
+  gitInfo: jsonb("git_info").$type<z.infer<typeof gitInfoSchema>>(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

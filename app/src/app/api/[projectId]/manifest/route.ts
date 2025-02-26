@@ -37,15 +37,19 @@ export async function GET(
   const currentUpdateId = request.headers.get("expo-current-update-id");
   const embeddedUpdateId = request.headers.get("expo-embedded-update-id");
 
-  await db.insert(accessLog).values({
-    projectId,
-    platform,
-    clientId,
-    runtimeVersion,
-    channelName,
-    currentUpdateId,
-    embeddedUpdateId,
-  });
+  try {
+    // This action allow error
+    // not use async because its will helpful in serverless service like vercel
+    await db.insert(accessLog).values({
+      projectId,
+      platform,
+      clientId,
+      runtimeVersion,
+      channelName,
+      currentUpdateId,
+      embeddedUpdateId,
+    });
+  } catch {}
 
   if (protocolVersionMaybeArray && Array.isArray(protocolVersionMaybeArray)) {
     return Response.json(

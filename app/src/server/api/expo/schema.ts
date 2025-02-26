@@ -138,3 +138,10 @@ export const expoConfigSchema = z.object({
     })
     .optional(),
 });
+
+export const gitInfoSchema = z.object({
+  hash: z.string().optional(),
+  isClean: z.boolean().optional(),
+  branch: z.string().optional(),
+  message: z.string().optional(),
+});

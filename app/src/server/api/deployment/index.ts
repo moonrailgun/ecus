@@ -1,14 +1,20 @@
 import fs from "fs/promises";
-import { expoConfigSchema, expoMetadataSchema } from "../expo/schema";
+import {
+  expoConfigSchema,
+  expoMetadataSchema,
+  gitInfoSchema,
+} from "../expo/schema";
 import { deployments } from "@/server/db/schema";
 import { db } from "@/server/db";
 import { uploadFile } from "@/server/file/client";
 import { buildDeploymentKey } from "@/server/file/helper";
+import { z } from "zod";
 
 export async function createDeploymentAndUploadFiles(
   projectId: string,
   userId: string,
   filelist: { name: string; key: string; path: string }[],
+  gitInfo: z.infer<typeof gitInfoSchema>,
 ) {
   const metadataFile = filelist.find((f) => f.name === "metadata.json");
   const expoConfigFile = filelist.find((f) => f.name === "expoConfig.json");
@@ -43,10 +49,15 @@ export async function createDeploymentAndUploadFiles(
         runtimeVersion,
         metadata,
         expoConfig,
+        gitInfo,
       })
       .returning();
 
-    const id = res[0]?.id!;
+    const id = res[0]?.id;
+
+    if (!id) {
+      throw new Error("unknow new deployment id");
+    }
 
     const dir = buildDeploymentKey(projectId, id);
 
