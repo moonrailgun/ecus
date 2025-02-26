@@ -4,19 +4,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { type NextRequest } from "next/server";
 import {
-  getLatestUpdateBundlePathForRuntimeVersionAsync,
   getRuntimeVersionActiveDeployment,
   NoUpdateAvailableError,
 } from "@/server/api/expo/helper";
 import {
-  getTypeOfUpdateAsync,
   putRollBackInResponseAsync,
   putUpdateInResponseAsync,
-  UpdateType,
 } from "@/server/api/expo/manifest";
 import { putNoUpdateAvailableInResponseAsync } from "@/server/api/expo/manifest";
 import { db } from "@/server/db";
-import { deployments } from "@/server/db/schema";
+import { accessLog, deployments } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(
@@ -30,6 +27,25 @@ export async function GET(
     "expo-protocol-version",
   );
   const channelName = request.headers.get("expo-channel-name");
+  const runtimeVersion =
+    request.headers.get("expo-runtime-version") ??
+    searchParams.get("runtime-version");
+  const protocolVersion = parseInt(protocolVersionMaybeArray ?? "0", 10);
+  const platform =
+    request.headers.get("expo-platform") ?? searchParams.get("platform");
+  const clientId = request.headers.get("eas-client-id");
+  const currentUpdateId = request.headers.get("expo-current-update-id");
+  const embeddedUpdateId = request.headers.get("expo-embedded-update-id");
+
+  await db.insert(accessLog).values({
+    projectId,
+    platform,
+    clientId,
+    runtimeVersion,
+    channelName,
+    currentUpdateId,
+    embeddedUpdateId,
+  });
 
   if (protocolVersionMaybeArray && Array.isArray(protocolVersionMaybeArray)) {
     return Response.json(
@@ -41,10 +57,7 @@ export async function GET(
       },
     );
   }
-  const protocolVersion = parseInt(protocolVersionMaybeArray ?? "0", 10);
 
-  const platform =
-    request.headers.get("expo-platform") ?? searchParams.get("platform");
   if (platform !== "ios" && platform !== "android") {
     return Response.json(
       {
@@ -55,10 +68,6 @@ export async function GET(
       },
     );
   }
-
-  const runtimeVersion =
-    request.headers.get("expo-runtime-version") ??
-    searchParams.get("runtime-version");
 
   if (!runtimeVersion || typeof runtimeVersion !== "string") {
     return Response.json(

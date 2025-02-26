@@ -213,3 +213,49 @@ export const deploymentRelations = relations(deployments, ({ one }) => ({
     references: [project.id],
   }),
 }));
+
+export const auditLog = createTable("audit_log", {
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .$defaultFn(() => createCuid()),
+  projectId: varchar("project_id", { length: 255 }).notNull(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  content: text("content"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const accessLog = createTable("access_log", {
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .$defaultFn(() => createCuid()),
+  projectId: varchar("project_id", { length: 255 }).notNull(),
+  platform: varchar("platform"),
+  clientId: varchar("client_id"),
+  runtimeVersion: varchar("runtime_version"),
+  channelName: varchar("channel_name"),
+  currentUpdateId: varchar("current_update_id"),
+  embeddedUpdateId: varchar("embedded_update_id"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const activeDeploymentHistory = createTable(
+  "active_deployment_history",
+  {
+    id: varchar("id", { length: 255 })
+      .primaryKey()
+      .$defaultFn(() => createCuid()),
+    projectId: varchar("project_id", { length: 255 }).notNull(),
+    runtimeVersion: varchar("runtime_version", { length: 255 }).notNull(),
+    channelId: varchar("channel_id", { length: 255 }).notNull(),
+    deploymentId: uuid("deployment_id"),
+    updateId: uuid("update_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+);

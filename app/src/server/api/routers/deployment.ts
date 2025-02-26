@@ -2,8 +2,13 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
-import { activeDeployments, channel } from "@/server/db/schema";
+import {
+  activeDeploymentHistory,
+  activeDeployments,
+  channel,
+} from "@/server/db/schema";
 import { and, eq } from "drizzle-orm";
+import { createAuditLog } from "@/server/db/helper";
 
 export const deploymentRouter = createTRPCRouter({
   promote: protectedProcedure
@@ -15,24 +20,54 @@ export const deploymentRouter = createTRPCRouter({
         channelId: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { projectId, runtimeVersion, deploymentId, channelId } = input;
+      const userId = ctx.session.user.id;
 
-      const activeDeploments = await db
-        .insert(activeDeployments)
-        .values({ projectId, runtimeVersion, deploymentId, channelId })
-        .onConflictDoUpdate({
-          target: [
-            activeDeployments.projectId,
-            activeDeployments.runtimeVersion,
-            activeDeployments.channelId,
-          ],
-          set: { deploymentId },
-        })
-        .returning();
+      const res = await db.transaction(async (tx) => {
+        const existed = await tx.query.activeDeployments.findFirst({
+          where: and(
+            eq(activeDeployments.projectId, projectId),
+            eq(activeDeployments.runtimeVersion, runtimeVersion),
+            eq(activeDeployments.channelId, channelId),
+          ),
+        });
+
+        if (existed?.updateId) {
+          await tx.insert(activeDeploymentHistory).values({
+            projectId,
+            runtimeVersion,
+            deploymentId,
+            channelId,
+            updateId: existed.updateId,
+          });
+        }
+
+        const res = await tx
+          .insert(activeDeployments)
+          .values({ projectId, runtimeVersion, deploymentId, channelId })
+          .onConflictDoUpdate({
+            target: [
+              activeDeployments.projectId,
+              activeDeployments.runtimeVersion,
+              activeDeployments.channelId,
+            ],
+            set: { deploymentId },
+          })
+          .returning();
+
+        return res;
+      });
+
+      await createAuditLog(projectId, userId, "promote deployment", {
+        projectId,
+        runtimeVersion,
+        deploymentId,
+        channelId,
+      });
 
       return {
-        activeDeploments,
+        activeDeploments: res,
       };
     }),
   activeDeployment: protectedProcedure
