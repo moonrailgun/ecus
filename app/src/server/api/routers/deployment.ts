@@ -59,7 +59,7 @@ export const deploymentRouter = createTRPCRouter({
         return res;
       });
 
-      await createAuditLog(projectId, userId, "promote deployment", {
+      void createAuditLog(projectId, userId, "promote deployment", {
         projectId,
         runtimeVersion,
         deploymentId,

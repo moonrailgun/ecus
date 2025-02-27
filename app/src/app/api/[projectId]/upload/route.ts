@@ -32,8 +32,6 @@ export async function PUT(
       (formData.get("gitInfo") as string) ?? "{}",
     );
 
-    console.log("file", file.type);
-
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }

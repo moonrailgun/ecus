@@ -13,8 +13,9 @@ import {
 } from "@/server/api/expo/manifest";
 import { putNoUpdateAvailableInResponseAsync } from "@/server/api/expo/manifest";
 import { db } from "@/server/db";
-import { accessLog, deployments } from "@/server/db/schema";
+import { deployments } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { createAccessLog } from "@/server/db/helper";
 
 export async function GET(
   request: NextRequest,
@@ -37,19 +38,15 @@ export async function GET(
   const currentUpdateId = request.headers.get("expo-current-update-id");
   const embeddedUpdateId = request.headers.get("expo-embedded-update-id");
 
-  try {
-    // This action allow error
-    // not use async because its will helpful in serverless service like vercel
-    await db.insert(accessLog).values({
-      projectId,
-      platform,
-      clientId,
-      runtimeVersion,
-      channelName,
-      currentUpdateId,
-      embeddedUpdateId,
-    });
-  } catch {}
+  void createAccessLog(
+    projectId,
+    platform,
+    clientId,
+    runtimeVersion,
+    channelName,
+    currentUpdateId,
+    embeddedUpdateId,
+  );
 
   if (protocolVersionMaybeArray && Array.isArray(protocolVersionMaybeArray)) {
     return Response.json(
