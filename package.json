@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "cd app && pnpm dev",
+    "release": "release-it",
+    "release:patch": "release-it -i patch",
     "release:packages": "pnpm -r --filter \"./packages/*\" publish --registry=https://registry.npmjs.com/"
   },
   "pnpm": {
