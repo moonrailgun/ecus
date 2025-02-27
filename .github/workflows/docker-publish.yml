@@ -53,4 +53,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: moonrailgun/ecus
-          # readme-filepath: ./README.md
+          readme-filepath: ./README.md
