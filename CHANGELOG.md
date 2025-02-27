@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1](https://github.com/moonrailgun/iexpo/compare/v0.2.0...v0.2.1) (2025-02-27)
+
+### Others
+
+* update docker file ([2f012f6](https://github.com/moonrailgun/iexpo/commit/2f012f6b9e0a1c90e694ba717bce0d002927e977))
+
 ## 0.2.0 (2025-02-27)
 
 ### Features
