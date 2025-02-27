@@ -1,7 +1,6 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
-
 import { db } from "@/server/db";
 import {
   accounts,
@@ -10,7 +9,7 @@ import {
   verificationTokens,
 } from "@/server/db/schema";
 import { env } from "@/env";
-import { get } from "lodash-es";
+import { get, lowerCase } from "lodash-es";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -93,7 +92,8 @@ export const authConfig = {
 
           const isMember = orgs.some(
             (org: unknown) =>
-              get(org, "login") === env.AUTH_GITHUB_ORGANIZATION,
+              lowerCase(get(org, "login")) ===
+              lowerCase(env.AUTH_GITHUB_ORGANIZATION),
           );
           if (isMember) {
             return true;
