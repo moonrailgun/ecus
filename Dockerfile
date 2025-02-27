@@ -7,13 +7,15 @@ COPY . .
 RUN npm install -g pnpm@9.7.1
 RUN pnpm install --frozen-lockfile
 
-RUN cd app && pnpm run build
+RUN cd app && SKIP_ENV_VALIDATION=1 pnpm run build
 
 # ------------------------------------------------
 
 FROM node:20-alpine AS runner
 
 WORKDIR /ecus
+
+ENV NODE_ENV production
 
 RUN mkdir app
 
