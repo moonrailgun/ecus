@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2](https://github.com/moonrailgun/iexpo/compare/v0.2.1...v0.2.2) (2025-02-28)
+
+### Features
+
+* add trust host config ([29a39c1](https://github.com/moonrailgun/iexpo/commit/29a39c1543352ff8d27f54158d0e5b20318d7bab))
+
+### Others
+
+* add readme ([c8ce8d7](https://github.com/moonrailgun/iexpo/commit/c8ce8d7e3acb7a81283c993588eb437b43998a7c))
+
 ## [0.2.1](https://github.com/moonrailgun/iexpo/compare/v0.2.0...v0.2.1) (2025-02-27)
 
 ### Others
