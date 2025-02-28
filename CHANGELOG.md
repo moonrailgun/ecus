@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.3](https://github.com/moonrailgun/iexpo/compare/v0.2.2...v0.2.3) (2025-02-28)
+
+### Bug Fixes
+
+* fix a bug which word maybe not correct match ([8d493b0](https://github.com/moonrailgun/iexpo/commit/8d493b0853eef75083f49d8e722705f80a464d02))
+
+### Others
+
+* update docker start command ([ecbb91f](https://github.com/moonrailgun/iexpo/commit/ecbb91f6347a4c2a9a02cc3b6ba9e8ecd86160e7))
+
 ## [0.2.2](https://github.com/moonrailgun/iexpo/compare/v0.2.1...v0.2.2) (2025-02-28)
 
 ### Features
