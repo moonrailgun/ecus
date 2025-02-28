@@ -1,1 +1,7 @@
 node_modules
+app/.env
+app/Dockerfile
+app/.dockerignore
+app/node_modules
+app/.next
+app/.git

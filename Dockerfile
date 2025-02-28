@@ -21,13 +21,7 @@ ENV PORT 5433
 RUN mkdir app
 
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/app/package.json ./app
-COPY --from=builder /app/app/.next ./app/.next
-COPY --from=builder /app/app/node_modules ./app/node_modules
-COPY --from=builder /app/app/public ./app/public
-COPY --from=builder /app/app/drizzle ./app/drizzle
-COPY --from=builder /app/app/drizzle.config.ts ./app/drizzle.config.ts
-COPY --from=builder /app/app/src/server/db/schema.ts ./app/src/server/db/schema.ts
+COPY --from=builder /app/app/ ./app
 
 WORKDIR /ecus/app
 
