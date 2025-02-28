@@ -16,6 +16,7 @@ FROM node:20-alpine AS runner
 WORKDIR /ecus
 
 ENV NODE_ENV production
+ENV PORT 5433
 
 RUN mkdir app
 
@@ -27,6 +28,6 @@ COPY --from=builder /app/app/public ./app/public
 
 WORKDIR /ecus/app
 
-CMD ["node_modules/.bin/next", "start"]
+CMD ["npm", "run", "docker:start"]
 
 EXPOSE 5433
