@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/moonrailgun/iexpo/compare/v0.2.3...v0.2.4) (2025-02-28)
+
+### Others
+
+* update dockerfile ([d44b563](https://github.com/moonrailgun/iexpo/commit/d44b56320b086d3334c358beb7b573e0bce20200))
+* update dockerfile ([0c75fbb](https://github.com/moonrailgun/iexpo/commit/0c75fbb1ed195061e893ec646e9db3a8018963ba))
+
 ## [0.2.3](https://github.com/moonrailgun/iexpo/compare/v0.2.2...v0.2.3) (2025-02-28)
 
 ### Bug Fixes
