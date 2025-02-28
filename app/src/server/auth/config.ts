@@ -9,7 +9,7 @@ import {
   verificationTokens,
 } from "@/server/db/schema";
 import { env } from "@/env";
-import { get, lowerCase } from "lodash-es";
+import { get, toLower } from "lodash-es";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -93,8 +93,8 @@ export const authConfig = {
 
           const isMember = orgs.some(
             (org: unknown) =>
-              lowerCase(get(org, "login")) ===
-              lowerCase(env.AUTH_GITHUB_ORGANIZATION),
+              toLower(get(org, "login")) ===
+              toLower(env.AUTH_GITHUB_ORGANIZATION),
           );
           if (isMember) {
             return true;
