@@ -10,6 +10,8 @@ import {
   createDateTimeField,
   Tabs,
   LoadingView,
+  Tooltip,
+  Tag,
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 import { IconPlus } from "tushan/icon";
@@ -22,6 +24,9 @@ import { DeploymentStatus } from "./DeploymentStatusField";
 const fields = [
   createTextField("id", {
     label: "ID",
+    list: {
+      width: 200,
+    },
   }),
   createTextField("runtimeVersion", {
     label: "Runtime Version",
@@ -41,6 +46,26 @@ const fields = [
       );
     },
   }),
+  createCustomField("gitInfo", {
+    label: "Git",
+    list: {
+      width: 120,
+    },
+    render: (gitInfo) => {
+      if (!gitInfo || !get(gitInfo, "branch")) {
+        return null;
+      }
+
+      return (
+        <Tooltip content={get(gitInfo, "message")}>
+          <Tag>
+            {get(gitInfo, "branch")}
+            {get(gitInfo, "isClean") === false ? "*" : ""}
+          </Tag>
+        </Tooltip>
+      );
+    },
+  }),
   createReferenceField("userId", {
     label: "User",
     reference: "user",
@@ -56,6 +81,9 @@ const fields = [
   }),
   createDateTimeField("createdAt", {
     label: "createdAt",
+    list: {
+      width: 180,
+    },
   }),
 ];
 
@@ -130,6 +158,11 @@ export const DeploymentList: React.FC = React.memo(() => {
               },
             },
           ],
+        }}
+        tableProps={{
+          scroll: {
+            x: 1000,
+          },
         }}
       />
     </>
