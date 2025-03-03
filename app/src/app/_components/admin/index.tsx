@@ -19,6 +19,7 @@ import { AdminGlobalModal } from "./AdminGlobalModal";
 import { Navbar } from "./Navbar";
 import { ChannelList } from "./route/ChannelList";
 import { ApikeyPage } from "./route/ApikeyPage";
+import { AdminDashboard } from "./route/Dashboard";
 
 const dataProvider = jsonServerProvider("/api/admin");
 
@@ -45,7 +46,7 @@ export const Admin = React.memo(() => {
   return (
     <Tushan
       basename="/admin"
-      dashboard={false}
+      dashboard={<AdminDashboard />}
       navbar={<Navbar />}
       dataProvider={dataProvider}
     >
