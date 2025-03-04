@@ -27,7 +27,7 @@ export async function GET(
   const protocolVersionMaybeArray = request.headers.get(
     "expo-protocol-version",
   );
-  const channelName = request.headers.get("expo-channel-name");
+  const channelName = request.headers.get("expo-channel-name") ?? "default";
   const runtimeVersion =
     request.headers.get("expo-runtime-version") ??
     searchParams.get("runtime-version");
@@ -91,7 +91,7 @@ export async function GET(
     // no runtime version
     return Response.json(
       {
-        error: "Unsupported runtime version",
+        error: `No matching deployment found in channel: ${channelName}.`,
       },
       {
         status: 404,
