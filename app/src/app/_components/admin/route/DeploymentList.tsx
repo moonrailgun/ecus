@@ -12,6 +12,7 @@ import {
   LoadingView,
   Tooltip,
   Tag,
+  JSONView,
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 import { IconPlus } from "tushan/icon";
@@ -91,11 +92,14 @@ const drawerFields = [
   ...fields,
   createCustomField("id", {
     label: "Config",
-    render: (id) => {
+    render: (id, record) => {
       const projectId = useAdminStore.getState().projectId;
 
       return (
         <Tabs>
+          <Tabs.TabPane key="git" title="Git Info" lazyload>
+            <JSONView data={record.gitInfo ?? {}} />
+          </Tabs.TabPane>
           <Tabs.TabPane key="meta" title="Metadata" lazyload>
             <RemoteFileViewer
               url={`/api/${projectId}/updates/${String(id)}/metadata.json`}
