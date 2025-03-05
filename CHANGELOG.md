@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.0](https://github.com/moonrailgun/iexpo/compare/v0.2.4...v0.3.0) (2025-03-05)
+
+### Features
+
+* add default channel handle with no channel request ([0178936](https://github.com/moonrailgun/iexpo/commit/01789362aee8d05706c300e3c874184be3325719))
+* add git info column ([4a4f94f](https://github.com/moonrailgun/iexpo/commit/4a4f94f0edb57f8716035dbb8400a6e27ad763ff))
+* add gitinfo detail display in deployment list drawer ([0992823](https://github.com/moonrailgun/iexpo/commit/09928238f034c714a3df75c6c848b108f3e1e810))
+* add statsAccess endpoint ([df55197](https://github.com/moonrailgun/iexpo/commit/df551975fa6e5709c3061372a1a1001ca10b9c90))
+* add usage chart ([fc75fa7](https://github.com/moonrailgun/iexpo/commit/fc75fa73532beb9f57e8dd35b11b75261173f507))
+
+### Others
+
+* add dashboard ([7ad3490](https://github.com/moonrailgun/iexpo/commit/7ad349087bce579622b37264f7bf09957fd1c398))
+* add init docker compose file ([0dfa0b1](https://github.com/moonrailgun/iexpo/commit/0dfa0b1b3420831f3c8bd863860974efeefcb34f))
+* update dashboard ([f6a5838](https://github.com/moonrailgun/iexpo/commit/f6a5838f1b60488cd45ea85e0dfee5695dca532f))
+
 ## [0.2.4](https://github.com/moonrailgun/iexpo/compare/v0.2.3...v0.2.4) (2025-02-28)
 
 ### Others
