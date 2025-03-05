@@ -8,7 +8,7 @@ import {
   activeDeployments,
   channel,
 } from "@/server/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, between, eq, sql } from "drizzle-orm";
 import { createAuditLog } from "@/server/db/helper";
 
 export const deploymentRouter = createTRPCRouter({
@@ -99,14 +99,17 @@ export const deploymentRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.string(),
+        startDate: z.date(),
+        endDate: z.date(),
+        timezone: z.string(),
       }),
     )
     .query(async ({ input }) => {
-      const { projectId } = input;
+      const { projectId, startDate, endDate, timezone } = input;
 
       const result = await db
         .select({
-          date: sql<Date>`date_trunc('day', deduplicated.created_at)`.as(
+          date: sql<Date>`date_trunc('day', deduplicated.created_at AT TIME ZONE ${timezone})`.as(
             "date",
           ),
           version: sql<string>`
@@ -136,9 +139,14 @@ export const deploymentRouter = createTRPCRouter({
           activeDeploymentHistory,
           sql`deduplicated.current_update_id::UUID = ${activeDeploymentHistory.updateId}`,
         )
-        .groupBy(
-          sql`date_trunc('day', deduplicated.created_at), deduplicated.project_id, version`,
+        .where(
+          between(
+            sql`deduplicated.created_at`,
+            startDate.toISOString(),
+            endDate.toISOString(),
+          ),
         )
+        .groupBy(sql`date, deduplicated.project_id, version`)
         .orderBy(sql`date DESC, deduplicated.project_id, version`);
 
       return result;

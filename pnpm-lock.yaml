@@ -60,6 +60,9 @@ importers:
       copy-to-clipboard:
         specifier: ^3.3.3
         version: 3.3.3
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       drizzle-orm:
         specifier: ^0.33.0
         version: 0.33.0(@types/react@18.3.18)(pg@8.13.3)(postgres@3.4.5)(react@18.2.0)
