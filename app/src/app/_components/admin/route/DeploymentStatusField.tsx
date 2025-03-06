@@ -26,7 +26,7 @@ export const DeploymentStatus: React.FC<DeploymentStatusProps> = React.memo(
     );
 
     return (
-      <div>
+      <div className="flex flex-wrap gap-1">
         {activeDeployment?.map((ad, i) => (
           <div key={i}>
             <Tag color="arcoblue">

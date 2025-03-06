@@ -25,7 +25,15 @@ export const deploymentRouter = createTRPCRouter({
       const { projectId, runtimeVersion, deploymentId, channelId } = input;
       const userId = ctx.session.user.id;
 
-      const res = await db.transaction(async (tx) => {
+      console.log("promote deployment:", {
+        projectId,
+        runtimeVersion,
+        deploymentId,
+        channelId,
+        userId,
+      });
+
+      const activeDeploments = await db.transaction(async (tx) => {
         const existed = await tx.query.activeDeployments.findFirst({
           where: and(
             eq(activeDeployments.projectId, projectId),
@@ -35,6 +43,10 @@ export const deploymentRouter = createTRPCRouter({
         });
 
         if (existed?.updateId) {
+          console.log(
+            "promote deployment process: detect exised active deployment:",
+            existed.updateId,
+          );
           await tx.insert(activeDeploymentHistory).values({
             projectId,
             runtimeVersion,
@@ -43,6 +55,8 @@ export const deploymentRouter = createTRPCRouter({
             updateId: existed.updateId,
           });
         }
+
+        console.log("promote deployment process: insert active deployment");
 
         const res = await tx
           .insert(activeDeployments)
@@ -57,7 +71,15 @@ export const deploymentRouter = createTRPCRouter({
           })
           .returning();
 
+        console.log(
+          "promote deployment process: insert active deployment success",
+        );
+
         return res;
+      });
+
+      console.log("promote deployment success:", {
+        activeDeploments,
       });
 
       void createAuditLog(projectId, userId, "promote deployment", {
@@ -68,7 +90,7 @@ export const deploymentRouter = createTRPCRouter({
       });
 
       return {
-        activeDeploments: res,
+        activeDeploments,
       };
     }),
   activeDeployment: protectedProcedure
@@ -90,8 +112,7 @@ export const deploymentRouter = createTRPCRouter({
             eq(activeDeployments.projectId, projectId),
             eq(activeDeployments.runtimeVersion, runtimeVersion),
           ),
-        )
-        .limit(1);
+        );
 
       return activeDeploments;
     }),
