@@ -207,7 +207,7 @@ export async function createRollBackDirectiveAsync(commitTime: Date) {
   };
 }
 
-export async function createNoUpdateAvailableDirectiveAsync() {
+export function createNoUpdateAvailableDirectiveAsync() {
   return {
     type: "noUpdateAvailable",
   };

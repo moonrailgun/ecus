@@ -5,22 +5,17 @@ import fs from "fs/promises";
 import { type NextRequest } from "next/server";
 import FormData from "form-data";
 import {
-  getAssetMetadataAsync,
-  getMetadataAsync,
-  convertSHA256HashToUUID,
   convertToDictionaryItemsRepresentation,
   signRSASHA256,
   getPrivateKeyAsync,
-  getExpoConfigAsync,
   createRollBackDirectiveAsync,
   NoUpdateAvailableError,
   createNoUpdateAvailableDirectiveAsync,
-  getAssetMetadataFromS3,
 } from "@/server/api/expo/helper";
 import { serializeDictionary } from "structured-headers";
-import { InferModel, InferSelectModel } from "drizzle-orm";
-import { activeDeployments, deployments } from "@/server/db/schema";
-import { buildDeploymentKey } from "@/server/file/helper";
+import { type InferSelectModel } from "drizzle-orm";
+import { type activeDeployments, type deployments } from "@/server/db/schema";
+import { getProjectDeploymentAssetsInfoWithCache } from "@/server/cache/deployment";
 
 export enum UpdateType {
   NORMAL_UPDATE,
@@ -47,7 +42,6 @@ export async function putUpdateInResponseAsync(
   const currentUpdateId = request.headers.get("expo-current-update-id");
   const expectSignatureHeader = request.headers.get("expo-expect-signature");
 
-  const metadata = deployment.metadata;
   const expoConfig = deployment.expoConfig;
 
   // NoUpdateAvailable directive only supported on protocol version 1
@@ -56,30 +50,11 @@ export async function putUpdateInResponseAsync(
     throw new NoUpdateAvailableError();
   }
 
-  const platformSpecificMetadata = metadata.fileMetadata[platform];
-
-  const [assets, launchAsset] = await Promise.all([
-    await Promise.all(
-      platformSpecificMetadata.assets.map((asset) =>
-        getAssetMetadataFromS3({
-          deployment,
-          key: `${buildDeploymentKey(deployment.projectId, deployment.id)}/${asset.path}`,
-          ext: asset.ext,
-          runtimeVersion,
-          platform,
-          isLaunchAsset: false,
-        }),
-      ),
-    ),
-    await getAssetMetadataFromS3({
-      deployment,
-      key: `${buildDeploymentKey(deployment.projectId, deployment.id)}/${platformSpecificMetadata.bundle}`,
-      isLaunchAsset: true,
-      runtimeVersion,
-      platform,
-      ext: null,
-    }),
-  ]);
+  const { assets, launchAsset } = await getProjectDeploymentAssetsInfoWithCache(
+    deployment,
+    runtimeVersion,
+    platform,
+  );
 
   const manifest = {
     id: activeDeployment.updateId ?? deployment.id,
@@ -172,7 +147,7 @@ export async function putRollBackInResponseAsync(
     throw new NoUpdateAvailableError();
   }
 
-  const directive = await createRollBackDirectiveAsync(
+  const directive = createRollBackDirectiveAsync(
     activeDeployment.updatedAt ?? activeDeployment.createdAt,
   );
 
@@ -231,7 +206,7 @@ export async function putNoUpdateAvailableInResponseAsync(
 
   const expectSignatureHeader = request.headers.get("expo-expect-signature");
 
-  const directive = await createNoUpdateAvailableDirectiveAsync();
+  const directive = createNoUpdateAvailableDirectiveAsync();
 
   let signature = null;
   if (expectSignatureHeader) {

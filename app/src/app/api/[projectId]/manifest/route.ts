@@ -3,19 +3,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { type NextRequest } from "next/server";
-import {
-  getRuntimeVersionActiveDeployment,
-  NoUpdateAvailableError,
-} from "@/server/api/expo/helper";
+import { NoUpdateAvailableError } from "@/server/api/expo/helper";
 import {
   putRollBackInResponseAsync,
   putUpdateInResponseAsync,
 } from "@/server/api/expo/manifest";
 import { putNoUpdateAvailableInResponseAsync } from "@/server/api/expo/manifest";
-import { db } from "@/server/db";
-import { deployments } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
 import { createAccessLog } from "@/server/db/helper";
+import {
+  getProjectActiveDeploymentWithCache,
+  getProjectMatchedDeploymentWithCache,
+} from "@/server/cache/deployment";
 
 export async function GET(
   request: NextRequest,
@@ -81,7 +79,7 @@ export async function GET(
     );
   }
 
-  const activeDeployment = await getRuntimeVersionActiveDeployment(
+  const activeDeployment = await getProjectActiveDeploymentWithCache(
     projectId,
     runtimeVersion,
     channelName,
@@ -102,13 +100,10 @@ export async function GET(
   try {
     if (activeDeployment.deploymentId) {
       // its should be normal update
-      const matchedDeployments = await db
-        .select()
-        .from(deployments)
-        .where(eq(deployments.id, activeDeployment.deploymentId))
-        .limit(1);
+      const deployment = await getProjectMatchedDeploymentWithCache(
+        activeDeployment.deploymentId,
+      );
 
-      const deployment = matchedDeployments[0];
       if (!deployment) {
         throw new Error("Not found target deployment");
       }

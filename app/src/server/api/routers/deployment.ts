@@ -10,6 +10,7 @@ import {
 } from "@/server/db/schema";
 import { and, between, eq, sql } from "drizzle-orm";
 import { createAuditLog } from "@/server/db/helper";
+import { clearProjectDeploymentCache } from "@/server/cache/deployment";
 
 export const deploymentRouter = createTRPCRouter({
   promote: protectedProcedure
@@ -47,16 +48,17 @@ export const deploymentRouter = createTRPCRouter({
             "promote deployment process: detect exised active deployment:",
             existed.updateId,
           );
+
           await tx.insert(activeDeploymentHistory).values({
             projectId,
             runtimeVersion,
-            deploymentId,
+            deploymentId: existed.deploymentId,
             channelId,
             updateId: existed.updateId,
           });
         }
 
-        console.log("promote deployment process: insert active deployment");
+        console.log("promote deployment process: insert active deployment...");
 
         const res = await tx
           .insert(activeDeployments)
@@ -81,6 +83,20 @@ export const deploymentRouter = createTRPCRouter({
       console.log("promote deployment success:", {
         activeDeploments,
       });
+
+      // clear old deployment cache
+      void db.query.channel
+        .findFirst({
+          where: eq(channel.id, channelId),
+        })
+        .then((d) => d?.name ?? "default")
+        .then((channelName) => {
+          return clearProjectDeploymentCache(
+            projectId,
+            runtimeVersion,
+            channelName,
+          );
+        });
 
       void createAuditLog(projectId, userId, "promote deployment", {
         projectId,

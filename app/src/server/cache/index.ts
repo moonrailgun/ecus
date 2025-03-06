@@ -12,7 +12,8 @@ export const cacheManager = createCache({
           store: new KeyvRedis(env.REDIS_URL),
         })
       : new Keyv({
-          store: new CacheableMemory({ ttl: 60_000, lruSize: 5000 }),
+          // store: new CacheableMemory({ ttl: 60_000, lruSize: 5000 }), // NOTICE: can not clear if set options
+          store: new CacheableMemory(),
         }),
   ],
 });
