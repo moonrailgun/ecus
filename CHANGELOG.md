@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.0](https://github.com/moonrailgun/iexpo/compare/v0.3.0...v0.4.0) (2025-03-06)
+
+### Features
+
+* add cache to speed up get manifest detail ([f5424dd](https://github.com/moonrailgun/iexpo/commit/f5424dd01d977f688ba883246f00c67bb9856405))
+
+### Others
+
+* remove active deployment returning in activeDeployment query ([1b4c9fb](https://github.com/moonrailgun/iexpo/commit/1b4c9fb4fce5c3f89c86d5746989d435b4f00651))
+
 ## [0.3.0](https://github.com/moonrailgun/iexpo/compare/v0.2.4...v0.3.0) (2025-03-05)
 
 ### Features
