@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import {
@@ -9,8 +8,7 @@ import {
   channel,
 } from "@/server/db/schema";
 import { and, between, eq, sql } from "drizzle-orm";
-import { createAuditLog } from "@/server/db/helper";
-import { clearProjectDeploymentCache } from "@/server/cache/deployment";
+import { promoteDeployment } from "../deployment";
 
 export const deploymentRouter = createTRPCRouter({
   promote: protectedProcedure
@@ -26,84 +24,13 @@ export const deploymentRouter = createTRPCRouter({
       const { projectId, runtimeVersion, deploymentId, channelId } = input;
       const userId = ctx.session.user.id;
 
-      console.log("promote deployment:", {
+      const activeDeploments = await promoteDeployment(
         projectId,
         runtimeVersion,
         deploymentId,
         channelId,
         userId,
-      });
-
-      const activeDeploments = await db.transaction(async (tx) => {
-        const existed = await tx.query.activeDeployments.findFirst({
-          where: and(
-            eq(activeDeployments.projectId, projectId),
-            eq(activeDeployments.runtimeVersion, runtimeVersion),
-            eq(activeDeployments.channelId, channelId),
-          ),
-        });
-
-        if (existed?.updateId) {
-          console.log(
-            "promote deployment process: detect exised active deployment:",
-            existed.updateId,
-          );
-
-          await tx.insert(activeDeploymentHistory).values({
-            projectId,
-            runtimeVersion,
-            deploymentId: existed.deploymentId,
-            channelId,
-            updateId: existed.updateId,
-          });
-        }
-
-        console.log("promote deployment process: insert active deployment...");
-
-        const res = await tx
-          .insert(activeDeployments)
-          .values({ projectId, runtimeVersion, deploymentId, channelId })
-          .onConflictDoUpdate({
-            target: [
-              activeDeployments.projectId,
-              activeDeployments.runtimeVersion,
-              activeDeployments.channelId,
-            ],
-            set: { deploymentId },
-          })
-          .returning();
-
-        console.log(
-          "promote deployment process: insert active deployment success",
-        );
-
-        return res;
-      });
-
-      console.log("promote deployment success:", {
-        activeDeploments,
-      });
-
-      // clear old deployment cache
-      void db.query.channel
-        .findFirst({
-          where: eq(channel.id, channelId),
-        })
-        .then((d) => d?.name ?? "default")
-        .then((channelName) => {
-          return clearProjectDeploymentCache(
-            projectId,
-            runtimeVersion,
-            channelName,
-          );
-        });
-
-      void createAuditLog(projectId, userId, "promote deployment", {
-        projectId,
-        runtimeVersion,
-        deploymentId,
-        channelId,
-      });
+      );
 
       return {
         activeDeploments,

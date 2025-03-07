@@ -1,9 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/server/auth";
 import { processZipFile } from "@/server/file/utils";
-import { createDeploymentAndUploadFiles } from "@/server/api/deployment";
-import { z } from "zod";
-import { gitInfoSchema } from "@/server/api/expo/schema";
+import {
+  createDeploymentAndUploadFiles,
+  findChannelByName,
+  promoteDeployment,
+} from "@/server/api/deployment";
+import { type z } from "zod";
+import { type gitInfoSchema } from "@/server/api/expo/schema";
 
 export async function PUT(
   request: NextRequest,
@@ -22,12 +26,15 @@ export async function PUT(
     );
   }
 
+  const userId = session.user.id;
+
   try {
     const urlParams = await params;
     const projectId = urlParams.projectId;
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const name = (formData.get("name") as string) ?? file.name;
+    const promote = formData.get("promote") as string | null;
     const gitInfo: z.infer<typeof gitInfoSchema> = JSON.parse(
       (formData.get("gitInfo") as string) ?? "{}",
     );
@@ -66,12 +73,36 @@ export async function PUT(
       );
     }
 
-    const { id, list } = await createDeploymentAndUploadFiles(
+    const { id, list, deployment } = await createDeploymentAndUploadFiles(
       projectId,
       session.user.id,
       filelist,
       gitInfo,
     );
+
+    if (promote && deployment.runtimeVersion) {
+      // if use promote in upload, then run promote logic when upload finished
+      const channelId = await findChannelByName(projectId, promote).then(
+        (res) => res?.id,
+      );
+
+      if (!channelId) {
+        return NextResponse.json(
+          { error: `This channel [${promote}] not found` },
+          { status: 400 },
+        );
+      }
+
+      if (channelId) {
+        await promoteDeployment(
+          projectId,
+          deployment.runtimeVersion,
+          deployment.id,
+          channelId,
+          userId,
+        );
+      }
+    }
 
     return NextResponse.json({
       id,
