@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.0](https://github.com/moonrailgun/iexpo/compare/v0.5.0...v0.6.0) (2025-03-10)
+
+### Features
+
+* display updateId and remove git width display ([72d2ed5](https://github.com/moonrailgun/iexpo/commit/72d2ed51c8f19391d3e50c54f5da28a648a4731b))
+
+### Bug Fixes
+
+* fix a bug which make alway return assets ([a086ba3](https://github.com/moonrailgun/iexpo/commit/a086ba37af3ce965a39ec2808813d95afae50671))
+
 ## [0.5.0](https://github.com/moonrailgun/iexpo/compare/v0.4.0...v0.5.0) (2025-03-07)
 
 ### Features
