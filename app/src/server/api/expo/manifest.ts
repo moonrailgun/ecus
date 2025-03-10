@@ -46,7 +46,7 @@ export async function putUpdateInResponseAsync(
 
   // NoUpdateAvailable directive only supported on protocol version 1
   // for protocol version 0, serve most recent update as normal
-  if (currentUpdateId === deployment.id && protocolVersion === 1) {
+  if (currentUpdateId === activeDeployment.updateId && protocolVersion === 1) {
     throw new NoUpdateAvailableError();
   }
 
