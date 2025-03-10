@@ -16,6 +16,7 @@ const fields = [
     reference: "channel",
     displayField: "name",
   }),
+  createTextField("updateId"),
   createReferenceField("deploymentId", {
     label: "Deployment",
     reference: "deployment",

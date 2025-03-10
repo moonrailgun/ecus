@@ -49,9 +49,6 @@ const fields = [
   }),
   createCustomField("gitInfo", {
     label: "Git",
-    list: {
-      width: 120,
-    },
     render: (gitInfo) => {
       if (!gitInfo || !get(gitInfo, "branch")) {
         return null;
