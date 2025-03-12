@@ -25,7 +25,7 @@ export const getProjectActiveDeploymentWithCache = createCachedFunction({
   },
   keyFn: (projectId, runtimeVersion, channelName) =>
     `active-deployment:${projectId}:${runtimeVersion}:${channelName}`,
-  ttl: 10 * 60 * 1000, // ttl
+  ttl: 1 * 60 * 60 * 1000, // ttl
 });
 
 export const getProjectMatchedDeploymentWithCache = createCachedFunction({
@@ -41,7 +41,7 @@ export const getProjectMatchedDeploymentWithCache = createCachedFunction({
     return deployment;
   },
   keyFn: (deploymentId) => `matched-deployment:${deploymentId}`,
-  ttl: 10 * 60 * 1000, // ttl
+  ttl: 1 * 60 * 60 * 1000, // ttl
 });
 
 export const getProjectDeploymentAssetsInfoWithCache = createCachedFunction({
@@ -87,7 +87,7 @@ export const getProjectDeploymentAssetsInfoWithCache = createCachedFunction({
     runtimeVersion: string,
     platform: "ios" | "android",
   ) => `deployment-assets-info:${deployment.id}:${runtimeVersion}:${platform}`,
-  ttl: 10 * 60 * 1000, // ttl
+  ttl: 1 * 60 * 60 * 1000, // ttl
 });
 
 export async function clearProjectDeploymentCache(
