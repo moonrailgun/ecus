@@ -1,6 +1,6 @@
 {
   "name": "ecus-cli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Command line interface of ECUS",
   "bin": {
     "ecus": "./bin/cli"
@@ -42,6 +42,7 @@
   "dependencies": {
     "@expo/config": "^10.0.10",
     "adm-zip": "^0.5.16",
+    "cli-progress": "^3.12.0",
     "crypto-random-string": "3.3.1",
     "dotenv": "^16.0.0",
     "filesize": "^8.0.7",
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.7",
+    "@types/cli-progress": "^3.11.6",
     "@types/glob": "^8.0.0",
     "@types/inquirer": "^8.2.1",
     "@types/lodash": "^4.14.170",

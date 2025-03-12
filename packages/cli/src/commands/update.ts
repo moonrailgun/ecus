@@ -2,10 +2,11 @@ import { ArgumentsCamelCase, CommandModule } from "yargs";
 import { bundleJsPackage } from "../utils/bundle";
 import got, { RequestError } from "got";
 import { getFileConfig } from "../utils/config";
-import { chalk, fs, path } from "zx";
+import { chalk, fs } from "zx";
 import FormData from "form-data";
 import _ from "lodash";
 import simpleGit from "simple-git";
+import { uploadWithProgress } from "../utils/file";
 
 export const updateCommand: CommandModule = {
   command: "update",
@@ -40,7 +41,7 @@ export const updateCommand: CommandModule = {
 
     console.log("Uploading to remote:", config.url);
     try {
-      const res = await got.put(
+      const res = await uploadWithProgress(
         `${config.url}/api/${config.projectId}/upload`,
         {
           headers: {
@@ -52,7 +53,7 @@ export const updateCommand: CommandModule = {
 
       console.log(
         "Uploaded completed, deployment id:",
-        _.get(JSON.parse(res.body), "id"),
+        _.get(JSON.parse(res), "id"),
       );
     } catch (err) {
       if (err instanceof RequestError) {
