@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/moonrailgun/iexpo/compare/v0.6.0...v0.6.1) (2025-03-12)
+
+### Others
+
+* improve upload display, add progress ([c4076f3](https://github.com/moonrailgun/iexpo/commit/c4076f3b0984ca4e65fd568f27826e5842bcb203))
+* update ttl for deployment cache ([1a9f9db](https://github.com/moonrailgun/iexpo/commit/1a9f9dbe7815a3aca324e5bff653f704854e3367))
+
 ## [0.6.0](https://github.com/moonrailgun/iexpo/compare/v0.5.0...v0.6.0) (2025-03-10)
 
 ### Features
