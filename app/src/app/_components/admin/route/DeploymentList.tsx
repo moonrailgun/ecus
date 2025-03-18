@@ -78,7 +78,7 @@ const fields = [
     ),
   }),
   createDateTimeField("createdAt", {
-    label: "createdAt",
+    label: "Created At",
     list: {
       width: 180,
     },
