@@ -13,6 +13,11 @@ export async function uploadWithProgress(
   );
   uploadBar.start(100, 0);
 
+  const stopProgress = () => {
+    uploadBar.stop();
+    console.log("Upload stopped.");
+  };
+
   res.on("uploadProgress", (progress: Progress) => {
     if (progress.total) {
       uploadBar.setTotal(progress.total);
@@ -22,9 +27,8 @@ export async function uploadWithProgress(
       uploadBar.update(progress.percent);
     }
 
-    if (progress.percent === 100) {
-      uploadBar.stop();
-      console.log("Upload completed. Server is process files...");
+    if (progress.percent >= 100) {
+      stopProgress();
     }
   });
 
@@ -33,6 +37,7 @@ export async function uploadWithProgress(
 
   return new Promise((resolve, reject) => {
     res.on("end", () => {
+      stopProgress();
       resolve(Buffer.concat(chunks).toString("utf-8"));
     });
     res.on("error", (err) => {
