@@ -25,7 +25,8 @@ export async function GET(
   const protocolVersionMaybeArray = request.headers.get(
     "expo-protocol-version",
   );
-  const channelName = request.headers.get("expo-channel-name") ?? "default";
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  const channelName = request.headers.get("expo-channel-name") || "default";
   const runtimeVersion =
     request.headers.get("expo-runtime-version") ??
     searchParams.get("runtime-version");
