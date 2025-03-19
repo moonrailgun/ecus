@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.2](https://github.com/moonrailgun/iexpo/compare/v0.6.1...v0.6.2) (2025-03-19)
+
+### Features
+
+* add config command which can update ([f1bd819](https://github.com/moonrailgun/iexpo/commit/f1bd819a1688ceac1fc656b2ae3b9862fad46227))
+
+### Others
+
+* add file caches ([8127a08](https://github.com/moonrailgun/iexpo/commit/8127a08fb57453ad4cc88965ec7296ed6303a339))
+* update label ([d0ac116](https://github.com/moonrailgun/iexpo/commit/d0ac1164442ecd2241468ce48a4e02bd07e35834))
+* update stop progress logic ([3bf13a8](https://github.com/moonrailgun/iexpo/commit/3bf13a87db9c376d066f64fc6d6b18670815a37f))
+* use || rather than ?? to face empty string case ([be32f81](https://github.com/moonrailgun/iexpo/commit/be32f81674ca5744cb478805fb250e51416ab8c3))
+
 ## [0.6.1](https://github.com/moonrailgun/iexpo/compare/v0.6.0...v0.6.1) (2025-03-12)
 
 ### Others
