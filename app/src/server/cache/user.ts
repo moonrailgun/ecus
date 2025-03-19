@@ -18,7 +18,7 @@ export async function getUserInfoWithApikey(
     where: eq(users.apiKey, apiKey),
   });
 
-  void cacheManager.set(cacheKey, JSON.stringify(user));
+  void cacheManager.set(cacheKey, JSON.stringify(user), 1 * 60 * 60 * 1000);
 
   return user;
 }

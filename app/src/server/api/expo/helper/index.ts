@@ -171,7 +171,7 @@ export async function getAssetMetadataFromS3(arg: GetAssetMetadataFromS3Arg) {
     url: `${env.S3_PUBLIC_HOST}/${arg.key}`,
   };
 
-  await cacheManager.set(cacheKey, JSON.stringify(ret));
+  await cacheManager.set(cacheKey, JSON.stringify(ret), 1 * 60 * 60 * 1000);
 
   return ret;
 }
