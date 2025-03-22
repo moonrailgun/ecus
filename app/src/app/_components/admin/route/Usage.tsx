@@ -17,16 +17,31 @@ import { getDateArray, getUserTimezone } from "@/utils/date";
 import { groupBy, uniq } from "lodash-es";
 
 const colors = [
-  "#8884d8",
-  "#82ca9d",
-  "#ff8042",
-  "#a05195",
-  "#0088FE",
-  "#FFBB28",
+  "#8884d8", // purple
+  "#82ca9d", // green
+  "#ff8042", // orange
+  "#a05195", // dark purple
+  "#0088FE", // blue
+  "#FFBB28", // yellow
+  "#00C49F", // teal
+  "#FF6B6B", // coral
+  "#4CAF50", // forest green
+  "#9C27B0", // violet
+  "#FF9800", // deep orange
+  "#2196F3", // light blue
+  "#E91E63", // pink
+  "#673AB7", // deep purple
+  "#3F51B5", // indigo
+  "#009688", // cyan
+  "#795548", // brown
+  "#607D8B", // blue grey
+  "#F44336", // red
+  "#CDDC39", // lime
 ];
 
 function useStatsAccessLog() {
   const [dateRange, setDateRange] = useState<number>(7);
+  const [selectedRuntime, setSelectedRuntime] = useState<string>("all");
   const projectId = useAdminStore((state) => state.projectId);
   const startDate = dayjs().subtract(dateRange, "day").startOf("day").toDate();
   const endDate = dayjs().endOf("day").toDate();
@@ -39,9 +54,18 @@ function useStatsAccessLog() {
     timezone,
   });
 
-  const allVersions = uniq(usage.map((item) => item.version));
+  // 提取所有可用的runtime版本
+  const allRuntimes = uniq(usage.map((item) => item.runtimeVersion));
 
-  const groupedData = groupBy(usage, "date");
+  // 根据所选runtime过滤数据
+  const filteredUsage =
+    selectedRuntime === "all"
+      ? usage
+      : usage.filter((item) => item.runtimeVersion === selectedRuntime);
+
+  const allVersions = uniq(filteredUsage.map((item) => item.version));
+
+  const groupedData = groupBy(filteredUsage, "date");
 
   const compressed = Object.keys(groupedData).map((date) => {
     const result: { date: string } & Record<string, unknown> = { date };
@@ -71,17 +95,32 @@ function useStatsAccessLog() {
     isLoading,
     accessResult: filledData,
     allVersions,
+    allRuntimes,
     dateRange,
     setDateRange,
+    selectedRuntime,
+    setSelectedRuntime,
   };
 }
 
 export const Usage: React.FC = React.memo(() => {
-  const { isLoading, accessResult, allVersions, dateRange, setDateRange } =
-    useStatsAccessLog();
+  const {
+    isLoading,
+    accessResult,
+    allVersions,
+    allRuntimes,
+    dateRange,
+    setDateRange,
+    selectedRuntime,
+    setSelectedRuntime,
+  } = useStatsAccessLog();
 
   const handleRangeChange = (value: number) => {
     setDateRange(value);
+  };
+
+  const handleRuntimeChange = (value: string) => {
+    setSelectedRuntime(value);
   };
 
   return (
@@ -91,7 +130,7 @@ export const Usage: React.FC = React.memo(() => {
         View unique usage traffic and count to understand user behavior trends
       </Typography.Paragraph>
 
-      <Space style={{ marginBottom: 20 }} align="center">
+      <Space style={{ marginBottom: 20 }} align="center" wrap>
         <span>Time Range:</span>
         <Select
           value={dateRange}
@@ -103,6 +142,20 @@ export const Usage: React.FC = React.memo(() => {
             { value: 14, label: "Last 14 Days" },
             { value: 30, label: "Last 30 Days" },
             { value: 90, label: "Last 90 Days" },
+          ]}
+        />
+
+        <span style={{ marginLeft: 20 }}>Runtime:</span>
+        <Select
+          value={selectedRuntime}
+          style={{ width: 180 }}
+          onChange={handleRuntimeChange}
+          options={[
+            { value: "all", label: "All Runtimes" },
+            ...allRuntimes.map((runtime) => ({
+              value: runtime,
+              label: runtime,
+            })),
           ]}
         />
       </Space>
@@ -143,9 +196,7 @@ export const Usage: React.FC = React.memo(() => {
                   label={{ value: "Count", angle: -90, position: "insideLeft" }}
                 />
                 <Tooltip labelFormatter={(label) => `Date: ${label}`} />
-                <Legend
-                  wrapperStyle={{ position: "relative", marginTop: "10px" }}
-                />
+                <Legend />
 
                 {allVersions.map((version, i) => {
                   const currentColor = colors[i % colors.length];

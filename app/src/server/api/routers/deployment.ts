@@ -83,6 +83,9 @@ export const deploymentRouter = createTRPCRouter({
         END
       `.as("version"),
           count: sql<number>`COUNT(*)`.as("count"),
+          runtimeVersion: sql<string>`deduplicated.runtime_version`.as(
+            "runtime_version",
+          ),
         })
         .from(
           sql`
@@ -92,6 +95,7 @@ export const deploymentRouter = createTRPCRouter({
             project_id,
             current_update_id,
             embedded_update_id,
+            runtime_version,
             created_at
           FROM ${accessLog}
           WHERE client_id IS NOT NULL AND project_id = ${projectId}
@@ -110,7 +114,9 @@ export const deploymentRouter = createTRPCRouter({
             endDate.toISOString(),
           ),
         )
-        .groupBy(sql`date, deduplicated.project_id, version`)
+        .groupBy(
+          sql`date, deduplicated.project_id, version, deduplicated.runtime_version`,
+        )
         .orderBy(sql`date DESC, deduplicated.project_id, version`);
 
       return result;
