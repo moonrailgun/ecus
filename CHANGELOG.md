@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0](https://github.com/moonrailgun/iexpo/compare/v0.6.2...v0.7.0) (2025-03-22)
+
+### Features
+
+* enhance usage statistics with runtime filtering and additional color options ([d19355a](https://github.com/moonrailgun/iexpo/commit/d19355a75f983a107d220d9ec65f5f63b9e852b7))
+
 ## [0.6.2](https://github.com/moonrailgun/iexpo/compare/v0.6.1...v0.6.2) (2025-03-19)
 
 ### Features
