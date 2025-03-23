@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.1](https://github.com/moonrailgun/iexpo/compare/v0.7.0...v0.7.1) (2025-03-23)
+
+### Others
+
+* return 200 for no runtime version response ([f23e4a1](https://github.com/moonrailgun/iexpo/commit/f23e4a1b86caa1440be25b04481b9b86e16e72e6))
+
 ## [0.7.0](https://github.com/moonrailgun/iexpo/compare/v0.6.2...v0.7.0) (2025-03-22)
 
 ### Features
