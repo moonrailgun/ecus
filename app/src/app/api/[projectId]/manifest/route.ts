@@ -88,14 +88,7 @@ export async function GET(
 
   if (!activeDeployment) {
     // no runtime version
-    return Response.json(
-      {
-        error: `No matching deployment found in channel: ${channelName}.`,
-      },
-      {
-        status: 404,
-      },
-    );
+    return await putNoUpdateAvailableInResponseAsync(request, protocolVersion);
   }
 
   try {
