@@ -15,7 +15,6 @@ export async function uploadWithProgress(
 
   const stopProgress = () => {
     uploadBar.stop();
-    console.log("Upload stopped.");
   };
 
   res.on("uploadProgress", (progress: Progress) => {
