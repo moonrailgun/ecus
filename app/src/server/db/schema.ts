@@ -232,21 +232,33 @@ export const auditLog = createTable("audit_log", {
     .notNull(),
 });
 
-export const accessLog = createTable("access_log", {
-  id: varchar("id", { length: 255 })
-    .primaryKey()
-    .$defaultFn(() => createCuid()),
-  projectId: varchar("project_id", { length: 255 }).notNull(),
-  platform: varchar("platform"),
-  clientId: varchar("client_id"),
-  runtimeVersion: varchar("runtime_version"),
-  channelName: varchar("channel_name"),
-  currentUpdateId: varchar("current_update_id"),
-  embeddedUpdateId: varchar("embedded_update_id"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-});
+export const accessLog = createTable(
+  "access_log",
+  {
+    id: varchar("id", { length: 255 })
+      .primaryKey()
+      .$defaultFn(() => createCuid()),
+    projectId: varchar("project_id", { length: 255 }).notNull(),
+    platform: varchar("platform"),
+    clientId: varchar("client_id"),
+    runtimeVersion: varchar("runtime_version"),
+    channelName: varchar("channel_name"),
+    currentUpdateId: varchar("current_update_id"),
+    embeddedUpdateId: varchar("embedded_update_id"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => ({
+    projectIdIdx: index("access_log_project_id_idx").on(table.projectId),
+    clientIdIdx: index("access_log_client_id_idx").on(table.clientId),
+    createdAtIdx: index("access_log_created_at_idx").on(table.createdAt),
+    clientCreatedIdx: index("access_log_client_created_idx").on(
+      table.clientId,
+      table.createdAt,
+    ),
+  }),
+);
 
 export const activeDeploymentHistory = createTable(
   "active_deployment_history",
