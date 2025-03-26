@@ -199,6 +199,7 @@ export const deployments = createTable("deployment", {
   expoConfig: jsonb("expo_config")
     .notNull()
     .$type<z.infer<typeof expoConfigSchema>>(),
+  updateMetadata: jsonb("update_metadata"), // info for update which can pass to client
   gitInfo: jsonb("git_info").$type<z.infer<typeof gitInfoSchema>>(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)

@@ -29,6 +29,13 @@
       "when": 1742876579615,
       "tag": "0003_add_accesslog_index",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1742996380946,
+      "tag": "0004_add_update_metadata",
+      "breakpoints": true
     }
   ]
 }

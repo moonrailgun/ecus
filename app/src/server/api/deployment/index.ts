@@ -107,6 +107,72 @@ export async function findChannelByName(
   });
 }
 
+export async function updateDeploymentMetadata(
+  deploymentId: string,
+  updateMetadata: Record<string, unknown>,
+  userId: string,
+) {
+  console.log("update deployment metadata:", {
+    deploymentId,
+    userId,
+  });
+
+  const updatedDeployment = await db.transaction(async (tx) => {
+    const deployment = await tx.query.deployments.findFirst({
+      where: eq(deployments.id, deploymentId),
+    });
+
+    if (!deployment) {
+      throw new Error(`Deployment not found with id: ${deploymentId}`);
+    }
+
+    const res = await tx
+      .update(deployments)
+      .set({ updateMetadata })
+      .where(eq(deployments.id, deploymentId))
+      .returning();
+
+    return res[0];
+  });
+
+  if (!updatedDeployment) {
+    throw new Error("Failed to update deployment metadata");
+  }
+
+  // Clear cache for any active deployments using this deployment
+  void db.query.activeDeployments
+    .findFirst({
+      where: eq(activeDeployments.deploymentId, deploymentId),
+    })
+    .then((activeDeployment) => {
+      if (activeDeployment) {
+        return db.query.channel
+          .findFirst({
+            where: eq(channel.id, activeDeployment.channelId),
+          })
+          .then((ch) => ch?.name ?? "default")
+          .then((channelName) => {
+            return clearProjectDeploymentCache(
+              activeDeployment.projectId,
+              activeDeployment.runtimeVersion,
+              channelName,
+            );
+          });
+      }
+    });
+
+  void createAuditLog(
+    updatedDeployment.projectId,
+    userId,
+    "update deployment metadata",
+    {
+      deploymentId,
+    },
+  );
+
+  return updatedDeployment;
+}
+
 export async function promoteDeployment(
   projectId: string,
   runtimeVersion: string,

@@ -8,7 +8,7 @@ import {
   channel,
 } from "@/server/db/schema";
 import { and, between, eq, sql } from "drizzle-orm";
-import { promoteDeployment } from "../deployment";
+import { promoteDeployment, updateDeploymentMetadata } from "../deployment";
 
 export const deploymentRouter = createTRPCRouter({
   promote: protectedProcedure
@@ -36,6 +36,7 @@ export const deploymentRouter = createTRPCRouter({
         activeDeploments,
       };
     }),
+
   activeDeployment: protectedProcedure
     .input(
       z.object({
@@ -120,5 +121,26 @@ export const deploymentRouter = createTRPCRouter({
         .orderBy(sql`date DESC, deduplicated.project_id, version`);
 
       return result;
+    }),
+  updateMetadata: protectedProcedure
+    .input(
+      z.object({
+        deploymentId: z.string(),
+        metadata: z.record(z.string(), z.any()),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { deploymentId, metadata } = input;
+      const userId = ctx.session.user.id;
+
+      const updatedDeployment = await updateDeploymentMetadata(
+        deploymentId,
+        metadata,
+        userId,
+      );
+
+      return {
+        updatedDeployment,
+      };
     }),
 });
