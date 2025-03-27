@@ -83,7 +83,7 @@ export const deploymentRouter = createTRPCRouter({
           ELSE COALESCE(active_deployment_history.deployment_id::TEXT, 'unknown')
         END
       `.as("version"),
-          count: sql<number>`COUNT(*)`.as("count"),
+          count: sql<number>`CAST(COUNT(1) AS INTEGER)`.as("count"),
           runtimeVersion: sql<string>`deduplicated.runtime_version`.as(
             "runtime_version",
           ),

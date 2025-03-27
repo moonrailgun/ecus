@@ -5,7 +5,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -54,10 +53,8 @@ function useStatsAccessLog() {
     timezone,
   });
 
-  // 提取所有可用的runtime版本
   const allRuntimes = uniq(usage.map((item) => item.runtimeVersion));
 
-  // 根据所选runtime过滤数据
   const filteredUsage =
     selectedRuntime === "all"
       ? usage
@@ -163,18 +160,11 @@ export const Usage: React.FC = React.memo(() => {
       <div>
         <Card>
           {isLoading ? (
-            <div
-              style={{
-                height: 400,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+            <div className="flex h-[400px] items-center justify-center">
               <Spin />
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={400} className="pb-4">
+            <ResponsiveContainer width="100%" minHeight={400} className="pb-4">
               <AreaChart
                 data={accessResult}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -195,8 +185,10 @@ export const Usage: React.FC = React.memo(() => {
                 <YAxis
                   label={{ value: "Count", angle: -90, position: "insideLeft" }}
                 />
-                <Tooltip labelFormatter={(label) => `Date: ${label}`} />
-                <Legend />
+                <Tooltip
+                  labelFormatter={(label) => `Date: ${label}`}
+                  formatter={(value) => Number(value).toLocaleString()}
+                />
 
                 {allVersions.map((version, i) => {
                   const currentColor = colors[i % colors.length];
