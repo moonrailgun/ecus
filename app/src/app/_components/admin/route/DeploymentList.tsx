@@ -188,7 +188,7 @@ const UpdateMetadataPanel: React.FC<{
     props.defaultValue && typeof props.defaultValue === "object"
       ? (props.defaultValue as Record<string, unknown>)
       : {
-          import: false,
+          important: false,
         };
   const updateMetadataMutation = api.deployment.updateMetadata.useMutation();
 
