@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.0](https://github.com/moonrailgun/iexpo/compare/v0.7.1...v0.8.0) (2025-03-27)
+
+### Features
+
+* add deployment.updateMetadata endpoint ([b5e795b](https://github.com/moonrailgun/iexpo/commit/b5e795bc9266419bc0e1c1527c184e308fc6f0b0))
+* add indexes to access_log table for improved query performance ([d507ea2](https://github.com/moonrailgun/iexpo/commit/d507ea2067180af8262dd1392c97936393389a08))
+* add update metadata modify and display ([0193a7e](https://github.com/moonrailgun/iexpo/commit/0193a7ee149d5cba29c2cf0a8ba2e2d5167a2b72))
+
+### Bug Fixes
+
+* fix render issue for usage chart ([651ac7a](https://github.com/moonrailgun/iexpo/commit/651ac7ad593a566a68d2ae673accf48835bd9be8))
+
+### Others
+
+* change typo ([884ccb1](https://github.com/moonrailgun/iexpo/commit/884ccb1f86710918e2cffcdd1a1f399903629607))
+* remove unnecessary log ([3c5714e](https://github.com/moonrailgun/iexpo/commit/3c5714e3fa449e6241c746e3a91f8d49218ac9ed))
+* update active history logic ([1bd3e99](https://github.com/moonrailgun/iexpo/commit/1bd3e99ffb62f3070b95aa9f1e9b367f1c666609))
+* update README ([aef4acc](https://github.com/moonrailgun/iexpo/commit/aef4acc41deb585d64090725db4b1b2812e2147e))
+
 ## [0.7.1](https://github.com/moonrailgun/iexpo/compare/v0.7.0...v0.7.1) (2025-03-23)
 
 ### Others
