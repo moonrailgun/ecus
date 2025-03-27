@@ -64,7 +64,7 @@ export async function putUpdateInResponseAsync(
     runtimeVersion,
     assets,
     launchAsset,
-    metadata: {},
+    metadata: deployment.updateMetadata ? deployment.updateMetadata : {},
     extra: {
       expoClient: expoConfig,
     },

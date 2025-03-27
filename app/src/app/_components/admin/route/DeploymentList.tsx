@@ -21,6 +21,9 @@ import { RemoteFileViewer } from "../../RemoteFileViewer";
 import { PromoteDeploymentModal } from "./PromoteDeploymentModal";
 import { openModal } from "../AdminGlobalModal";
 import { DeploymentStatus } from "./DeploymentStatusField";
+import { JSONEditor } from "../JSONEditor";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 const fields = [
   createTextField("id", {
@@ -97,6 +100,12 @@ const drawerFields = [
           <Tabs.TabPane key="git" title="Git Info" lazyload>
             <JSONView data={record.gitInfo ?? {}} />
           </Tabs.TabPane>
+          <Tabs.TabPane key="updateMetadata" title="Update Metadata" lazyload>
+            <UpdateMetadataPanel
+              deploymentId={String(record.id)}
+              defaultValue={record.updateMetadata}
+            />
+          </Tabs.TabPane>
           <Tabs.TabPane key="meta" title="Metadata" lazyload>
             <RemoteFileViewer
               url={`/api/${projectId}/updates/${String(id)}/metadata.json`}
@@ -170,3 +179,35 @@ export const DeploymentList: React.FC = React.memo(() => {
   );
 });
 DeploymentList.displayName = "DeploymentList";
+
+const UpdateMetadataPanel: React.FC<{
+  deploymentId: string;
+  defaultValue: unknown;
+}> = React.memo((props) => {
+  const defaultValue =
+    props.defaultValue && typeof props.defaultValue === "object"
+      ? (props.defaultValue as Record<string, unknown>)
+      : {
+          import: false,
+        };
+  const updateMetadataMutation = api.deployment.updateMetadata.useMutation();
+
+  return (
+    <JSONEditor
+      defaultValue={defaultValue}
+      onConfirm={async (data) => {
+        try {
+          await updateMetadataMutation.mutateAsync({
+            deploymentId: props.deploymentId,
+            metadata: data,
+          });
+
+          toast.success("Update metadata successfully");
+        } catch (err) {
+          toast.error("Update metadata failed: " + String(err));
+        }
+      }}
+    />
+  );
+});
+UpdateMetadataPanel.displayName = "UpdateMetadataPanel";
