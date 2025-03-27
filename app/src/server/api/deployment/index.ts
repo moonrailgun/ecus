@@ -189,29 +189,6 @@ export async function promoteDeployment(
   });
 
   const activeDeploments = await db.transaction(async (tx) => {
-    const existed = await tx.query.activeDeployments.findFirst({
-      where: and(
-        eq(activeDeployments.projectId, projectId),
-        eq(activeDeployments.runtimeVersion, runtimeVersion),
-        eq(activeDeployments.channelId, channelId),
-      ),
-    });
-
-    if (existed?.updateId) {
-      console.log(
-        "promote deployment process: detect exised active deployment:",
-        existed.updateId,
-      );
-
-      await tx.insert(activeDeploymentHistory).values({
-        projectId,
-        runtimeVersion,
-        deploymentId: existed.deploymentId,
-        channelId,
-        updateId: existed.updateId,
-      });
-    }
-
     console.log("promote deployment process: insert active deployment...");
 
     const res = await tx
@@ -226,6 +203,17 @@ export async function promoteDeployment(
         set: { deploymentId },
       })
       .returning();
+
+    if (res[0]?.updateId) {
+      // add to active deployment history which use for usage.
+      await tx.insert(activeDeploymentHistory).values({
+        projectId,
+        runtimeVersion,
+        deploymentId,
+        channelId,
+        updateId: res[0].updateId,
+      });
+    }
 
     console.log("promote deployment process: insert active deployment success");
 
