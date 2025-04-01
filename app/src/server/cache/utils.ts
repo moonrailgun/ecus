@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { cacheManager } from ".";
 
 export interface CachedFunctionOptions<Args extends unknown[], Result> {
@@ -16,7 +17,9 @@ export function createCachedFunction<Args extends unknown[], Result>(
     const cached = await cacheManager.get<Result>(cacheKey);
 
     if (cached) {
-      console.log("Apply cache:", cacheKey);
+      if (env.NODE_ENV === "development") {
+        console.log("Apply cache:", cacheKey);
+      }
       return cached;
     }
 

@@ -59,8 +59,8 @@ export async function putUpdateInResponseAsync(
   const manifest = {
     id: activeDeployment.updateId ?? deployment.id,
     createdAt: activeDeployment.updatedAt
-      ? activeDeployment.updatedAt.toISOString()
-      : deployment.createdAt.toISOString(),
+      ? new Date(activeDeployment.updatedAt).toISOString()
+      : new Date(deployment.createdAt).toISOString(),
     runtimeVersion,
     assets,
     launchAsset,
