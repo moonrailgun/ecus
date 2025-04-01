@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.1](https://github.com/moonrailgun/iexpo/compare/v0.8.0...v0.8.1) (2025-04-01)
+
+### Bug Fixes
+
+* fix type cast issue ([ecaa164](https://github.com/moonrailgun/iexpo/commit/ecaa1645085a1c90ff5debdfe1775006f2bc758f))
+
 ## [0.8.0](https://github.com/moonrailgun/iexpo/compare/v0.7.1...v0.8.0) (2025-03-27)
 
 ### Features
