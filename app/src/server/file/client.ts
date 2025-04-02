@@ -29,7 +29,7 @@ export async function uploadFile(
 
     const uploadParams = {
       Bucket: env.S3_BUCKET_NAME,
-      Key: key, // 文件存储在 S3 上的路径
+      Key: key, // File path stored on S3
       Body: buffer,
       ContentType: mimeType ?? undefined,
       ChecksumAlgorithm: ChecksumAlgorithm.SHA256,

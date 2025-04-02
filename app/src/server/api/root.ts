@@ -2,6 +2,10 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { deploymentRouter } from "./routers/deployment";
 import { projectRouter } from "./routers/project";
 import { userRouter } from "./routers/user";
+import { initCronJobs } from "../db/cron";
+
+// Initialize cron jobs
+initCronJobs();
 
 /**
  * This is the primary router for your server.
