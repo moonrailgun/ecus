@@ -1,3 +1,4 @@
+import { compact } from "lodash-es";
 import { cacheManager } from ".";
 import {
   getAssetMetadataFromS3,
@@ -90,14 +91,19 @@ export const getProjectDeploymentAssetsInfoWithCache = createCachedFunction({
   ttl: 1 * 60 * 60 * 1000, // ttl
 });
 
+/**
+ * Clear the cache for the given projectId, runtimeVersion, channelName, and deploymentId
+ */
 export async function clearProjectDeploymentCache(
   projectId: string,
   runtimeVersion: string,
   channelName: string,
+  deploymentId: string | null,
 ) {
-  const cacheKeys = [
+  const cacheKeys = compact([
     `active-deployment:${projectId}:${runtimeVersion}:${channelName}`,
-  ];
+    deploymentId && `matched-deployment:${deploymentId}`,
+  ]);
 
   console.log("clearProjectDeploymentCache", cacheKeys);
 

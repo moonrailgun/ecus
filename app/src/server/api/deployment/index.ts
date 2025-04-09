@@ -156,6 +156,7 @@ export async function updateDeploymentMetadata(
               activeDeployment.projectId,
               activeDeployment.runtimeVersion,
               channelName,
+              activeDeployment.deploymentId,
             );
           });
       }
@@ -235,6 +236,7 @@ export async function promoteDeployment(
         projectId,
         runtimeVersion,
         channelName,
+        deploymentId,
       );
     });
 
