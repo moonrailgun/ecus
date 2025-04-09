@@ -276,4 +276,9 @@ export const activeDeploymentHistory = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
+  (table) => ({
+    updateIdIdx: index("active_deployment_history_update_id_idx").on(
+      table.updateId,
+    ),
+  }),
 );
