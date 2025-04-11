@@ -5,6 +5,7 @@ import {
   createDeploymentAndUploadFiles,
   findChannelByName,
   promoteDeployment,
+  updateDeploymentMetadata,
 } from "@/server/api/deployment";
 import { type z } from "zod";
 import { type gitInfoSchema } from "@/server/api/expo/schema";
@@ -35,6 +36,7 @@ export async function PUT(
     const file = formData.get("file") as File;
     const name = (formData.get("name") as string) ?? file.name;
     const promote = formData.get("promote") as string | null;
+    const metadata = formData.get("metadata") as string | null;
     const gitInfo: z.infer<typeof gitInfoSchema> = JSON.parse(
       (formData.get("gitInfo") as string) ?? "{}",
     );
@@ -79,6 +81,21 @@ export async function PUT(
       filelist,
       gitInfo,
     );
+
+    if (metadata && typeof metadata === "string") {
+      try {
+        const json = JSON.parse(metadata);
+        await updateDeploymentMetadata(deployment.id, json, userId);
+      } catch (err) {
+        console.error("Update metadata failed", err);
+        return NextResponse.json(
+          {
+            error: `Update metadata failed, please ensure metadata is valid json string`,
+          },
+          { status: 400 },
+        );
+      }
+    }
 
     if (promote && deployment.runtimeVersion) {
       // if use promote in upload, then run promote logic when upload finished

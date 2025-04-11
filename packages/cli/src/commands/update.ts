@@ -12,9 +12,14 @@ export const updateCommand: CommandModule = {
   command: "update",
   describe: "create a update and upload",
   builder: (yargs) =>
-    yargs.option("promote", {
-      description: "promote to channel when uploaded.",
-    }),
+    yargs
+      .option("promote", {
+        description: "promote to channel when uploaded.",
+      })
+      .option("metadata", {
+        description:
+          "add update metadata info after in deployment. its should be a json string.",
+      }),
   async handler(args: ArgumentsCamelCase<{ promote?: string }>) {
     const git = simpleGit();
     const hash = await git.revparse("HEAD");
@@ -22,6 +27,7 @@ export const updateCommand: CommandModule = {
     const branch = (await git.branch()).current;
     const message = (await git.log()).latest?.message;
     const promote = args.promote;
+    const metadata = args.metadata;
 
     const config = await getFileConfig();
     if (!config.url || !config.apikey || !config.projectId) {
@@ -37,6 +43,9 @@ export const updateCommand: CommandModule = {
     form.append("gitInfo", JSON.stringify({ hash, isClean, branch, message }));
     if (promote) {
       form.append("promote", promote);
+    }
+    if (metadata) {
+      form.append("metadata", metadata);
     }
 
     console.log("Uploading to remote:", config.url);
