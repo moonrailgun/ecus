@@ -39,6 +39,7 @@ const fields = [
     },
   }),
   createCustomField("id", {
+    key: "status",
     label: "Status",
     render: (id, record) => {
       return (
@@ -91,6 +92,7 @@ const fields = [
 const drawerFields = [
   ...fields,
   createCustomField("id", {
+    key: "config",
     label: "Config",
     render: (id, record) => {
       const projectId = useAdminStore.getState().projectId;

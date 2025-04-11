@@ -11,6 +11,7 @@
     "build:ios": "expo run:ios --configuration Release",
     "build:clean": "expo prebuild --clean",
     "update:build": "ecus update",
+    "update:build:metadata": "ecus update --metadata '{\"important\": true}'",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint"
