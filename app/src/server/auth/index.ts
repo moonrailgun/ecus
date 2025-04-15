@@ -1,4 +1,4 @@
-import NextAuth, { Session } from "next-auth";
+import NextAuth, { type Session } from "next-auth";
 import { cache } from "react";
 
 import { authConfig } from "./config";
