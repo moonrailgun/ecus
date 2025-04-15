@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.9.0](https://github.com/moonrailgun/iexpo/compare/v0.8.1...v0.9.0) (2025-04-15)
+
+### Features
+
+* add access log cleanup cron job ([cd00c37](https://github.com/moonrailgun/iexpo/commit/cd00c37d5ad421e938b0241cf46ee0fd66032e3e))
+* add metadata option to update command ([f96443f](https://github.com/moonrailgun/iexpo/commit/f96443fe654488f5d5b1382c60643e3821a92acf))
+
+### Bug Fixes
+
+* include deploymentId in cache clearing logic ([0726847](https://github.com/moonrailgun/iexpo/commit/072684782cf64646b78aab42c699f7d7d253dd4a))
+
+### Document
+
+* add README ([4f02aed](https://github.com/moonrailgun/iexpo/commit/4f02aed0fe7beb8218170fc92b2c29ef0fb02f3d))
+
+### Others
+
+* add index on updateId in activeDeploymentHistory table ([8c5f009](https://github.com/moonrailgun/iexpo/commit/8c5f00962bb4fd2124004d8684ca0c09787007ad))
+* change import statement to use type for Session ([1579150](https://github.com/moonrailgun/iexpo/commit/1579150f9bc33259320bc34bd070968027ec399c))
+* update dependencies and add key to avoid conflict ([294cd53](https://github.com/moonrailgun/iexpo/commit/294cd5317578bb7accd5dbba523d452ee0e20a36))
+
 ## [0.8.1](https://github.com/moonrailgun/iexpo/compare/v0.8.0...v0.8.1) (2025-04-01)
 
 ### Bug Fixes
