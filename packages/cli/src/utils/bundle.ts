@@ -14,7 +14,7 @@ export async function bundleJsPackage(): Promise<string> {
   console.log(chalk.blue("Start to export js bundle with `expo export`:"));
   const buildStart = Date.now();
 
-  const e = $`npx expo export`;
+  const e = $`npx expo export --platform ios --platform android`;
   for await (const chunk of e.stdout) {
     echo(chunk);
   }
