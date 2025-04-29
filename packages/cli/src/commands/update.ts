@@ -49,6 +49,7 @@ export const updateCommand: CommandModule = {
     }
 
     console.log("Uploading to remote:", config.url);
+    const startTime = Date.now();
     try {
       const res = await uploadWithProgress(
         `${config.url}/api/${config.projectId}/upload`,
@@ -60,11 +61,15 @@ export const updateCommand: CommandModule = {
         },
       );
 
+      const duration = Date.now() - startTime;
       console.log(
-        "Uploaded completed, deployment id:",
+        `Uploaded completed in ${duration}ms, deployment id:`,
         _.get(JSON.parse(res), "id"),
       );
     } catch (err) {
+      const duration = Date.now() - startTime;
+      console.log(`Upload failed in ${duration}ms`);
+
       if (err instanceof RequestError) {
         console.log(err.response?.body);
       }
