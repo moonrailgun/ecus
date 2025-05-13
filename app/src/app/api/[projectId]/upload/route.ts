@@ -9,6 +9,7 @@ import {
 } from "@/server/api/deployment";
 import { type z } from "zod";
 import { type gitInfoSchema } from "@/server/api/expo/schema";
+import { handleZipFile } from "./_handleZipFile";
 
 export async function PUT(
   request: NextRequest,
@@ -59,33 +60,10 @@ export async function PUT(
       );
     }
 
-    const filelist = await processZipFile(file);
-
-    if (!filelist.some((f) => f.name === "metadata.json")) {
-      return NextResponse.json(
-        { error: "Its not a react native bundle" },
-        { status: 400 },
-      );
-    }
-
-    if (!filelist.some((f) => f.name === "expoConfig.json")) {
-      return NextResponse.json(
-        { error: "Its not a expo bundle" },
-        { status: 400 },
-      );
-    }
-
-    const { id, list, deployment } = await createDeploymentAndUploadFiles(
-      projectId,
-      session.user.id,
-      filelist,
-      gitInfo,
-    );
-
+    let metadataJson: Record<string, unknown> | null = null;
     if (metadata && typeof metadata === "string") {
       try {
-        const json = JSON.parse(metadata);
-        await updateDeploymentMetadata(deployment.id, json, userId);
+        metadataJson = JSON.parse(metadata);
       } catch (err) {
         console.error("Update metadata failed", err);
         return NextResponse.json(
@@ -97,33 +75,15 @@ export async function PUT(
       }
     }
 
-    if (promote && deployment.runtimeVersion) {
-      // if use promote in upload, then run promote logic when upload finished
-      const channelId = await findChannelByName(projectId, promote).then(
-        (res) => res?.id,
-      );
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-      if (!channelId) {
-        return NextResponse.json(
-          { error: `This channel [${promote}] not found` },
-          { status: 400 },
-        );
-      }
-
-      if (channelId) {
-        await promoteDeployment(
-          projectId,
-          deployment.runtimeVersion,
-          deployment.id,
-          channelId,
-          userId,
-        );
-      }
-    }
-
-    return NextResponse.json({
-      id,
-      list,
+    return handleZipFile({
+      file: fileBuffer,
+      projectId,
+      userId,
+      gitInfo,
+      metadata: metadataJson,
+      promoteChannelName: promote,
     });
   } catch (err) {
     return NextResponse.json(

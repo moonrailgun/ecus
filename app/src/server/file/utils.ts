@@ -3,16 +3,14 @@ import fs from "fs/promises";
 import path from "path";
 import extract from "extract-zip";
 
-export async function processZipFile(zipFile: File) {
+export async function processZipFile(zipFile: Buffer<ArrayBufferLike>) {
   const dirName = String(Date.now());
   const tempDir = path.join(os.tmpdir(), "expo", dirName);
-
-  const buffer = Buffer.from(await zipFile.arrayBuffer());
 
   await fs.mkdir(tempDir, { recursive: true });
 
   const filePath = path.join(tempDir, "file.zip");
-  await fs.writeFile(filePath, buffer);
+  await fs.writeFile(filePath, zipFile);
 
   await extract(filePath, {
     dir: tempDir,
