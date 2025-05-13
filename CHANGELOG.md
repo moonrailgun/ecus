@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.10.0](https://github.com/moonrailgun/iexpo/compare/v0.9.0...v0.10.0) (2025-05-13)
+
+### Features
+
+* add upload duration logging to update command ([3df1a18](https://github.com/moonrailgun/iexpo/commit/3df1a181aaf4b47038914210565a33c5685742cb))
+* **cli:** prevent duplicate entry of .ecus/ in .gitignore ([311cf35](https://github.com/moonrailgun/iexpo/commit/311cf3561b3906123ee266bad3cb469449646879))
+* **upload:** implement chunked file upload and handle zip files ([d2a7b39](https://github.com/moonrailgun/iexpo/commit/d2a7b39dd8026de05f53f8549e272f4a31679802))
+
+### Others
+
+* update cli version ([6b79587](https://github.com/moonrailgun/iexpo/commit/6b7958771511363b8edb944440f4b16a6ac60972))
+* update version to 1.2.3 and modify export command for iOS and Android platforms ([52937b7](https://github.com/moonrailgun/iexpo/commit/52937b7e8c8695e4691b1c55f67202046906102f))
+
 ## [0.9.0](https://github.com/moonrailgun/iexpo/compare/v0.8.1...v0.9.0) (2025-04-15)
 
 ### Features
