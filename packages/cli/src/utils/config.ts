@@ -16,7 +16,10 @@ export async function updateFileConfig(config: Config) {
     );
 
     if (await fs.exists(".gitignore")) {
-      await fs.appendFile(".gitignore", "\n.ecus/\n");
+      const content = await fs.readFile(".gitignore", "utf-8");
+      if (!content.includes(".ecus/")) {
+        await fs.appendFile(".gitignore", "\n.ecus/\n");
+      }
     }
   }
 
