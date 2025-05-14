@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.10.1](https://github.com/moonrailgun/iexpo/compare/v0.10.0...v0.10.1) (2025-05-14)
+
+### Others
+
+* **upload:** update parameter handling in chunked upload routes ([f83fa21](https://github.com/moonrailgun/iexpo/commit/f83fa210b361c2b39643ee045081721ae98fb178))
+
 ## [0.10.0](https://github.com/moonrailgun/iexpo/compare/v0.9.0...v0.10.0) (2025-05-13)
 
 ### Features
