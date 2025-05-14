@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/server/auth";
-import { createWriteStream, unlink } from "fs";
-import { readdir } from "fs/promises";
+import { createWriteStream } from "fs";
 import { join } from "path";
 import { Readable } from "stream";
 import { promisify } from "util";
@@ -9,12 +8,11 @@ import { pipeline } from "stream";
 import { ensureTempDir, TEMP_UPLOAD_DIR } from "@/server/utils";
 
 const pipelineAsync = promisify(pipeline);
-const unlinkAsync = promisify(unlink);
 
 // Handle chunked uploads with resumability
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { projectId: string } },
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   // Ensure authentication
   const session = await getSession(request.headers);
@@ -25,7 +23,7 @@ export async function PATCH(
     );
   }
 
-  const projectId = params.projectId;
+  const projectId = (await params).projectId;
 
   // Get upload metadata from headers
   const uploadId = request.headers.get("upload-id");

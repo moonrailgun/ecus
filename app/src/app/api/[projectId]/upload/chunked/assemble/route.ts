@@ -17,7 +17,7 @@ const unlinkAsync = promisify(unlink);
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { projectId: string } },
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   const session = await getSession(request.headers);
   if (!session) {
@@ -30,7 +30,7 @@ export async function POST(
   const { uploadId, filename, gitInfo, metadata, promote } =
     await request.json();
 
-  const projectId = params.projectId;
+  const projectId = (await params).projectId;
 
   try {
     if (!uploadId) {

@@ -1,12 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/server/auth";
-import { processZipFile } from "@/server/file/utils";
-import {
-  createDeploymentAndUploadFiles,
-  findChannelByName,
-  promoteDeployment,
-  updateDeploymentMetadata,
-} from "@/server/api/deployment";
 import { type z } from "zod";
 import { type gitInfoSchema } from "@/server/api/expo/schema";
 import { handleZipFile } from "./_handleZipFile";
