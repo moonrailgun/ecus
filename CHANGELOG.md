@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.11.0](https://github.com/moonrailgun/iexpo/compare/v0.10.1...v0.11.0) (2025-05-15)
+
+### Features
+
+* **deployment:** enhance statistics query with deduplication and grouping logic ([072dfe6](https://github.com/moonrailgun/iexpo/commit/072dfe662a3a04e80381b119fbd97a905817cc29))
+
 ## [0.10.1](https://github.com/moonrailgun/iexpo/compare/v0.10.0...v0.10.1) (2025-05-14)
 
 ### Others
