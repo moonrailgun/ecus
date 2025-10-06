@@ -93,7 +93,16 @@ export const deploymentRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { projectId, startDate, endDate, timezone } = input;
 
+      // Start timing
+      const totalStartTime = performance.now();
+      console.log(`[STATS_ACCESS] Starting statistics data query`);
+
       // Step 1: Get the deduplicated client records within the specified date range
+      const step1StartTime = performance.now();
+      console.log(
+        `[STATS_ACCESS] Step 1: Starting to fetch deduplicated client records`,
+      );
+
       const deduplicatedLogs = await db.execute<AccessLogRecord>(sql`
         SELECT DISTINCT ON (client_id)
           client_id,
@@ -110,19 +119,37 @@ export const deploymentRouter = createTRPCRouter({
         ORDER BY client_id, created_at DESC
       `);
 
+      console.log(
+        `[STATS_ACCESS] Step 1: Fetching deduplicated client records completed, duration: ${(performance.now() - step1StartTime).toFixed(2)}ms, fetched ${deduplicatedLogs.length} records`,
+      );
+
       if (deduplicatedLogs.length === 0) {
+        console.log(
+          `[STATS_ACCESS] No records found, returning empty array early`,
+        );
         return [];
       }
 
       // Step 2: Get the related deployment history records
+      const step2StartTime = performance.now();
+      console.log(
+        `[STATS_ACCESS] Step 2: Starting to fetch deployment history records`,
+      );
+
       const updateIds = deduplicatedLogs
         .map((log: AccessLogRecord) => log.current_update_id)
-        .filter((id): id is string => id !== null); // 类型守卫确保非null
+        .filter((id): id is string => id !== null); // Type guard to ensure non-null
+
+      console.log(
+        `[STATS_ACCESS] Number of non-null updateIds after filtering: ${updateIds.length}`,
+      );
 
       const deploymentMapping: Record<string, string> = {};
 
       if (updateIds.length > 0) {
         // Get the deployment IDs in bulk, rather than doing a join in the main query
+        const deploymentHistoryStartTime = performance.now();
+
         const deploymentHistory = await db
           .select()
           .from(activeDeploymentHistory)
@@ -133,6 +160,10 @@ export const deploymentRouter = createTRPCRouter({
             )})`,
           );
 
+        console.log(
+          `[STATS_ACCESS] Fetching deployment history records completed, duration: ${(performance.now() - deploymentHistoryStartTime).toFixed(2)}ms, fetched ${deploymentHistory.length} records`,
+        );
+
         // Create a mapping from updateId to deploymentId
         for (const record of deploymentHistory) {
           if (record.updateId && record.deploymentId) {
@@ -141,7 +172,16 @@ export const deploymentRouter = createTRPCRouter({
         }
       }
 
+      console.log(
+        `[STATS_ACCESS] Step 2: Deployment history record processing completed, total duration: ${(performance.now() - step2StartTime).toFixed(2)}ms`,
+      );
+
       // Step 3: Group and count in memory
+      const step3StartTime = performance.now();
+      console.log(
+        `[STATS_ACCESS] Step 3: Starting grouping and counting in memory`,
+      );
+
       type VersionData = { count: number; runtimeVersion: string };
       type DateGroup = Record<string, VersionData>;
       const groupedData: Record<string, DateGroup> = {};
@@ -181,7 +221,14 @@ export const deploymentRouter = createTRPCRouter({
         }
       }
 
+      console.log(
+        `[STATS_ACCESS] Step 3: In-memory grouping and counting completed, duration: ${(performance.now() - step3StartTime).toFixed(2)}ms, grouped by ${Object.keys(groupedData).length} dates`,
+      );
+
       // Step 4: Convert to the expected output format
+      const step4StartTime = performance.now();
+      console.log(`[STATS_ACCESS] Step 4: Starting data format conversion`);
+
       const result: StatsResult[] = [];
 
       for (const [dateStr, versions] of Object.entries(groupedData)) {
@@ -204,6 +251,14 @@ export const deploymentRouter = createTRPCRouter({
         // If dates are the same, sort by version
         return a.version.localeCompare(b.version);
       });
+
+      console.log(
+        `[STATS_ACCESS] Step 4: Data format conversion completed, duration: ${(performance.now() - step4StartTime).toFixed(2)}ms, produced ${result.length} results`,
+      );
+
+      console.log(
+        `[STATS_ACCESS] Statistics data query completed, total duration: ${(performance.now() - totalStartTime).toFixed(2)}ms`,
+      );
 
       return result;
     }),
