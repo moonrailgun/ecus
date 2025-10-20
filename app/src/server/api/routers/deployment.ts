@@ -10,18 +10,7 @@ import {
 } from "@/server/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { promoteDeployment, updateDeploymentMetadata } from "../deployment";
-import dayjs from "dayjs";
-
-// 定义日志记录类型
-interface AccessLogRecord {
-  client_id: string;
-  project_id: string;
-  current_update_id: string | null;
-  embedded_update_id: string | null;
-  runtime_version: string;
-  created_at: string;
-  [key: string]: unknown; // 添加索引签名
-}
+import pMap from "p-map";
 
 // 定义结果数据类型
 interface StatsResult {
@@ -30,6 +19,9 @@ interface StatsResult {
   count: number;
   runtimeVersion: string;
 }
+
+const UUID_REGEX =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
 export const deploymentRouter = createTRPCRouter({
   promote: protectedProcedure
@@ -93,172 +85,126 @@ export const deploymentRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { projectId, startDate, endDate, timezone } = input;
 
-      // Start timing
-      const totalStartTime = performance.now();
-      console.log(`[STATS_ACCESS] Starting statistics data query`);
+      console.time("[STATS_ACCESS] total");
 
-      // Step 1: Get the deduplicated client records within the specified date range
-      const step1StartTime = performance.now();
-      console.log(
-        `[STATS_ACCESS] Step 1: Starting to fetch deduplicated client records`,
-      );
-
-      const deduplicatedLogs = await db.execute<AccessLogRecord>(sql`
-        SELECT DISTINCT ON (client_id)
-          client_id,
-          project_id,
-          current_update_id,
-          embedded_update_id,
-          runtime_version,
-          created_at
+      console.time("[STATS_ACCESS] step1-fetch-update-ids");
+      const updateIdRows = await db.execute<{ current_update_id: string }>(sql`
+        SELECT DISTINCT current_update_id
         FROM ${accessLog}
         WHERE
-          client_id IS NOT NULL
-          AND project_id = ${projectId}
+          project_id = ${projectId}
           AND created_at BETWEEN ${startDate.toISOString()} AND ${endDate.toISOString()}
-        ORDER BY client_id, created_at DESC
+          AND current_update_id IS NOT NULL
       `);
+      console.timeEnd("[STATS_ACCESS] step1-fetch-update-ids");
 
-      console.log(
-        `[STATS_ACCESS] Step 1: Fetching deduplicated client records completed, duration: ${(performance.now() - step1StartTime).toFixed(2)}ms, fetched ${deduplicatedLogs.length} records`,
-      );
+      const updateIds = updateIdRows
+        .map((row) => row.current_update_id)
+        .filter((id): id is string => id.length > 0);
 
-      if (deduplicatedLogs.length === 0) {
-        console.log(
-          `[STATS_ACCESS] No records found, returning empty array early`,
-        );
+      if (updateIds.length === 0) {
+        console.timeEnd("[STATS_ACCESS] total");
         return [];
       }
 
-      // Step 2: Get the related deployment history records
-      const step2StartTime = performance.now();
-      console.log(
-        `[STATS_ACCESS] Step 2: Starting to fetch deployment history records`,
+      console.time("[STATS_ACCESS] step2-query-daily");
+      type StatsRow = {
+        date: string | Date;
+        count: number | string;
+        runtimeVersion: string | null;
+        isEmbed: boolean;
+      };
+
+      const dailyStatsByUpdateId = new Map<string, StatsRow[]>();
+
+      await pMap(
+        updateIds,
+        async (updateId) => {
+          const rows = await db.execute<StatsRow>(sql`
+            SELECT
+              (created_at AT TIME ZONE ${timezone})::date AS date,
+              COUNT(DISTINCT client_id) AS count,
+              MAX(runtime_version) AS "runtimeVersion",
+              BOOL_OR(current_update_id = embedded_update_id) AS "isEmbed"
+            FROM ${accessLog}
+            WHERE
+              project_id = ${projectId}
+              AND created_at BETWEEN ${startDate.toISOString()} AND ${endDate.toISOString()}
+              AND current_update_id = ${updateId}
+            GROUP BY 1
+            ORDER BY 1 ASC
+          `);
+
+          if (rows.length > 0) {
+            dailyStatsByUpdateId.set(updateId, rows);
+          }
+        },
+        { concurrency: 5 },
       );
+      console.timeEnd("[STATS_ACCESS] step2-query-daily");
 
-      const updateIds = deduplicatedLogs
-        .map((log: AccessLogRecord) => log.current_update_id)
-        .filter((id): id is string => id !== null); // Type guard to ensure non-null
+      console.time("[STATS_ACCESS] step3-combine-results");
 
-      console.log(
-        `[STATS_ACCESS] Number of non-null updateIds after filtering: ${updateIds.length}`,
+      const updateIdSet = new Set(
+        Array.from(dailyStatsByUpdateId.keys()).filter((id) =>
+          UUID_REGEX.test(id),
+        ),
       );
 
       const deploymentMapping: Record<string, string> = {};
 
-      if (updateIds.length > 0) {
-        // Get the deployment IDs in bulk, rather than doing a join in the main query
-        const deploymentHistoryStartTime = performance.now();
-
-        const deploymentHistory = await db
+      if (updateIdSet.size > 0) {
+        const mappingRows = await db
           .select()
           .from(activeDeploymentHistory)
           .where(
             sql`${activeDeploymentHistory.updateId} IN (${sql.join(
-              updateIds.map((id) => sql`${id}::UUID`),
+              Array.from(updateIdSet).map((id) => sql`${id}::UUID`),
               sql`, `,
             )})`,
           );
 
-        console.log(
-          `[STATS_ACCESS] Fetching deployment history records completed, duration: ${(performance.now() - deploymentHistoryStartTime).toFixed(2)}ms, fetched ${deploymentHistory.length} records`,
-        );
-
-        // Create a mapping from updateId to deploymentId
-        for (const record of deploymentHistory) {
+        for (const record of mappingRows) {
           if (record.updateId && record.deploymentId) {
             deploymentMapping[record.updateId] = record.deploymentId;
           }
         }
       }
 
-      console.log(
-        `[STATS_ACCESS] Step 2: Deployment history record processing completed, total duration: ${(performance.now() - step2StartTime).toFixed(2)}ms`,
-      );
-
-      // Step 3: Group and count in memory
-      const step3StartTime = performance.now();
-      console.log(
-        `[STATS_ACCESS] Step 3: Starting grouping and counting in memory`,
-      );
-
-      type VersionData = { count: number; runtimeVersion: string };
-      type DateGroup = Record<string, VersionData>;
-      const groupedData: Record<string, DateGroup> = {};
-
-      for (const log of deduplicatedLogs) {
-        const dateKey = dayjs(log.created_at).tz(timezone).format("YYYY-MM-DD");
-
-        // Determine the version
-        let version = "unknown";
-        if (
-          log.current_update_id &&
-          log.embedded_update_id &&
-          log.current_update_id === log.embedded_update_id
-        ) {
-          version = "embed";
-        } else if (
-          log.current_update_id &&
-          deploymentMapping[log.current_update_id]
-        ) {
-          version = String(deploymentMapping[log.current_update_id]);
-        }
-
-        // Initialize the grouping structure
-        if (!groupedData[dateKey]) {
-          groupedData[dateKey] = {};
-        }
-
-        if (!groupedData[dateKey][version]) {
-          groupedData[dateKey][version] = {
-            count: 0,
-            runtimeVersion: log.runtime_version,
-          };
-        }
-        // Increment the count
-        if (groupedData[dateKey][version]) {
-          groupedData[dateKey][version]!.count += 1;
-        }
-      }
-
-      console.log(
-        `[STATS_ACCESS] Step 3: In-memory grouping and counting completed, duration: ${(performance.now() - step3StartTime).toFixed(2)}ms, grouped by ${Object.keys(groupedData).length} dates`,
-      );
-
-      // Step 4: Convert to the expected output format
-      const step4StartTime = performance.now();
-      console.log(`[STATS_ACCESS] Step 4: Starting data format conversion`);
-
       const result: StatsResult[] = [];
 
-      for (const [dateStr, versions] of Object.entries(groupedData)) {
-        for (const [versionKey, data] of Object.entries(versions)) {
+      for (const [updateId, rows] of dailyStatsByUpdateId) {
+        for (const row of rows) {
+          let version: string;
+          if (row.isEmbed) {
+            version = "embed";
+          } else {
+            version = deploymentMapping[updateId] ?? "unknown";
+          }
+
           result.push({
-            date: new Date(dateStr),
-            version: versionKey,
-            count: data.count,
-            runtimeVersion: data.runtimeVersion,
+            date: row.date instanceof Date ? row.date : new Date(row.date),
+            version,
+            count:
+              typeof row.count === "string"
+                ? Number.parseInt(row.count, 10)
+                : row.count,
+            runtimeVersion: row.runtimeVersion ?? "unknown",
           });
         }
       }
 
-      // Sort the results
       result.sort((a, b) => {
-        // First sort by date in descending order
         const dateCompare = b.date.getTime() - a.date.getTime();
-        if (dateCompare !== 0) return dateCompare;
+        if (dateCompare !== 0) {
+          return dateCompare;
+        }
 
-        // If dates are the same, sort by version
         return a.version.localeCompare(b.version);
       });
+      console.timeEnd("[STATS_ACCESS] step3-combine-results");
 
-      console.log(
-        `[STATS_ACCESS] Step 4: Data format conversion completed, duration: ${(performance.now() - step4StartTime).toFixed(2)}ms, produced ${result.length} results`,
-      );
-
-      console.log(
-        `[STATS_ACCESS] Statistics data query completed, total duration: ${(performance.now() - totalStartTime).toFixed(2)}ms`,
-      );
+      console.timeEnd("[STATS_ACCESS] total");
 
       return result;
     }),
