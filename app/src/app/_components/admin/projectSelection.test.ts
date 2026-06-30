@@ -9,14 +9,14 @@ const projects = [
 ];
 const lastProject = { id: "project-a", name: "Alpha" };
 
-test("selects the first remaining project after deleting the current project", () => {
+void test("selects the first remaining project after deleting the current project", () => {
   assert.deepEqual(getNextProjectSelection(projects, "project-a"), {
     projectId: "project-b",
     projectName: "Beta",
   });
 });
 
-test("clears the current project when deleting the last project", () => {
+void test("clears the current project when deleting the last project", () => {
   assert.deepEqual(getNextProjectSelection([lastProject], "project-a"), {
     projectId: "",
     projectName: "",

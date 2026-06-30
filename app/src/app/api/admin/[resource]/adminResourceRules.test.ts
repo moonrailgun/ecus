@@ -7,28 +7,28 @@ import {
   isProtectedChannelName,
 } from "../../../../utils/adminResourceRules.ts";
 
-test("treats channel queries as project scoped", () => {
+void test("treats channel queries as project scoped", () => {
   assert.equal(isProjectScopedResource("deployment"), true);
   assert.equal(isProjectScopedResource("active"), true);
   assert.equal(isProjectScopedResource("channel"), true);
   assert.equal(isProjectScopedResource("user"), false);
 });
 
-test("protects default project channels from deletion", () => {
+void test("protects default project channels from deletion", () => {
   assert.equal(isProtectedChannelName("default"), true);
   assert.equal(isProtectedChannelName("production"), true);
   assert.equal(isProtectedChannelName("staging"), false);
   assert.equal(isProtectedChannelName(null), false);
 });
 
-test("overrides stale project filters for project scoped resources", () => {
+void test("overrides stale project filters for project scoped resources", () => {
   assert.deepEqual(
     applyProjectFilter("channel", { projectId: "old", q: "prod" }, "current"),
     { projectId: "current", q: "prod" },
   );
 });
 
-test("leaves unscoped resources untouched", () => {
+void test("leaves unscoped resources untouched", () => {
   assert.deepEqual(
     applyProjectFilter("user", { projectId: "old" }, "current"),
     {
