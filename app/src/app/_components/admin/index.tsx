@@ -28,8 +28,21 @@ import { ApikeyPage } from "./route/ApikeyPage";
 import { AdminDashboard } from "./route/Dashboard";
 import { Usage } from "./route/Usage";
 import { ProjectSetting } from "./route/ProjectSetting";
+import { applyProjectFilter } from "@/utils/adminResourceRules";
+import { useAdminStore } from "./useAdminStore";
 
-const dataProvider = jsonServerProvider("/api/admin");
+const baseDataProvider = jsonServerProvider("/api/admin");
+const dataProvider: typeof baseDataProvider = {
+  ...baseDataProvider,
+  getList: (resource, params) => {
+    const projectId = useAdminStore.getState().projectId;
+
+    return baseDataProvider.getList(resource, {
+      ...params,
+      filter: applyProjectFilter(resource, params.filter, projectId),
+    });
+  },
+};
 
 export const Admin = React.memo(() => {
   const [isClient, setIsClient] = useState(false);

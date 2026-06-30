@@ -63,7 +63,11 @@ export const PromoteDeploymentModal: React.FC<Props> = React.memo((props) => {
         <Form.Item label="Channel" field="channelId">
           {/* @ts-ignore */}
           <ReferenceFieldEdit
-            options={{ reference: "channel", displayField: "name" }}
+            options={{
+              reference: "channel",
+              displayField: "name",
+              defaultFilter: { projectId },
+            }}
           />
         </Form.Item>
         <Form.Item>

@@ -143,6 +143,7 @@ export const DeploymentList: React.FC = React.memo(() => {
         Create
       </Button>
       <ListTable
+        key={projectId}
         defaultFilter={{ projectId }}
         fields={fields}
         drawerFields={drawerFields}

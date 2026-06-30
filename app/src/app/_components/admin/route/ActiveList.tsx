@@ -35,6 +35,7 @@ export const ActiveList: React.FC = React.memo(() => {
   return (
     <>
       <ListTable
+        key={projectId}
         defaultFilter={{ projectId }}
         fields={fields}
         action={{

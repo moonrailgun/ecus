@@ -3,7 +3,7 @@ import { count, desc, eq, sql, type SQL } from "drizzle-orm";
 import { get } from "lodash-es";
 import { type NextRequest, NextResponse } from "next/server";
 import { resourceMap } from "./_resource";
-import { activeDeployments, deployments } from "@/server/db/schema";
+import { activeDeployments, channel, deployments } from "@/server/db/schema";
 
 export async function GET(
   request: NextRequest,
@@ -19,17 +19,15 @@ export async function GET(
   if (resource in resourceMap) {
     const table = resourceMap[resource]!;
     let where: SQL = sql`1 = 1`;
+    const projectId = searchParams.get("projectId");
 
-    if (resource === "deployment") {
-      const projectId = searchParams.get("projectId");
-      if (projectId) {
+    if (projectId) {
+      if (resource === "deployment") {
         where = eq(deployments.projectId, projectId);
-      }
-    }
-    if (resource === "active") {
-      const projectId = searchParams.get("projectId");
-      if (projectId) {
+      } else if (resource === "active") {
         where = eq(activeDeployments.projectId, projectId);
+      } else if (resource === "channel") {
+        where = eq(channel.projectId, projectId);
       }
     }
 
