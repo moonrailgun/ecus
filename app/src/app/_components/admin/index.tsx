@@ -9,7 +9,13 @@ import {
   CustomRoute,
 } from "tushan";
 import { useSession } from "next-auth/react";
-import { IconCompass, IconDashboard, IconList, IconWifi } from "tushan/icon";
+import {
+  IconCompass,
+  IconDashboard,
+  IconList,
+  IconSettings,
+  IconWifi,
+} from "tushan/icon";
 import React from "react";
 import { DeploymentCreate } from "./route/DeploymentCreate";
 import { DeploymentList } from "./route/DeploymentList";
@@ -21,6 +27,7 @@ import { ChannelList } from "./route/ChannelList";
 import { ApikeyPage } from "./route/ApikeyPage";
 import { AdminDashboard } from "./route/Dashboard";
 import { Usage } from "./route/Usage";
+import { ProjectSetting } from "./route/ProjectSetting";
 
 const dataProvider = jsonServerProvider("/api/admin");
 
@@ -75,6 +82,9 @@ export const Admin = React.memo(() => {
       </CustomRoute>
       <CustomRoute name="usage" icon={<IconDashboard />}>
         <Usage />
+      </CustomRoute>
+      <CustomRoute name="setting" label="Setting" icon={<IconSettings />}>
+        <ProjectSetting />
       </CustomRoute>
       <AdminGlobalModal />
     </Tushan>
