@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.12.0](https://github.com/moonrailgun/iexpo/compare/v0.11.0...v0.12.0) (2026-06-30)
+
+### Features
+
+* **admin:** add channel management ([2604858](https://github.com/moonrailgun/iexpo/commit/26048585c32ec08e216fd55d186a054cf68ca9d4))
+* **admin:** add project settings management ([8964a6f](https://github.com/moonrailgun/iexpo/commit/8964a6f1be8120c76631fa21582dfbb53b0f0f00))
+
+### Bug Fixes
+
+* **admin:** scope resources by project ([18f0855](https://github.com/moonrailgun/iexpo/commit/18f08555f2f8e5cd2bfbfe3434fa0704921d705d))
+
+### Others
+
+* add canary docker build ([d5ec798](https://github.com/moonrailgun/iexpo/commit/d5ec798c708c7fcad2a064290694db16bae06bf4))
+* add logs for deployment ([fed3bb0](https://github.com/moonrailgun/iexpo/commit/fed3bb04836a001d4f576393e67ac0030304deb9))
+* release cli v1.4.0 and update export command with asset map and source maps ([d25e91c](https://github.com/moonrailgun/iexpo/commit/d25e91cba6f405f9f6ca3c74f95c2e9019e86c7f))
+
 ## [0.11.0](https://github.com/moonrailgun/iexpo/compare/v0.10.1...v0.11.0) (2025-05-15)
 
 ### Features
