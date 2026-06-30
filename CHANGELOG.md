@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.1](https://github.com/moonrailgun/iexpo/compare/v0.12.0...v0.12.1) (2026-06-30)
+
+### Bug Fixes
+
+* **ci:** satisfy lint for node tests ([6a20e65](https://github.com/moonrailgun/iexpo/commit/6a20e65ad7220f34f64148a52d7a2b3838e7491a))
+
 ## [0.12.0](https://github.com/moonrailgun/iexpo/compare/v0.11.0...v0.12.0) (2026-06-30)
 
 ### Features
