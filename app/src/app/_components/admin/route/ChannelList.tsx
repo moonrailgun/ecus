@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
-  createReferenceField,
   createTextField,
   ListTable,
   createDateTimeField,
@@ -8,15 +7,36 @@ import {
 } from "tushan";
 import { useAdminStore } from "../useAdminStore";
 
-const fields = [
-  createTextField("id"),
-  createTextField("projectId"),
-  createTextField("name"),
-  createDateTimeField("createdAt"),
-];
-
 export const ChannelList: React.FC = React.memo(() => {
   const projectId = useAdminStore((state) => state.projectId);
+  const fields = useMemo(
+    () => [
+      createTextField("id"),
+      createTextField("projectId", {
+        create: {
+          hidden: true,
+          default: projectId,
+        },
+        edit: {
+          hidden: true,
+        },
+      }),
+      createTextField("name", {
+        create: {
+          rules: [{ required: true, message: "Channel name is required" }],
+        },
+      }),
+      createDateTimeField("createdAt", {
+        create: {
+          hidden: true,
+        },
+        edit: {
+          hidden: true,
+        },
+      }),
+    ],
+    [projectId],
+  );
 
   if (!projectId) {
     return <LoadingView />;
@@ -25,10 +45,13 @@ export const ChannelList: React.FC = React.memo(() => {
   return (
     <>
       <ListTable
+        key={projectId}
         defaultFilter={{ projectId }}
         fields={fields}
         action={{
+          create: true,
           detail: true,
+          delete: true,
         }}
       />
     </>

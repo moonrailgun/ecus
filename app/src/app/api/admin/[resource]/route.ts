@@ -52,3 +52,48 @@ export async function GET(
 
   return NextResponse.json({ error: "Unknown resouce" }, { status: 400 });
 }
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ resource: string }> },
+) {
+  const { resource } = await params;
+
+  if (resource !== "channel") {
+    return NextResponse.json(
+      { error: "Create is not supported for this resource" },
+      { status: 405 },
+    );
+  }
+
+  const body = (await request.json()) as {
+    projectId?: string;
+    name?: string;
+  };
+  const projectId = body.projectId?.trim();
+  const name = body.name?.trim();
+
+  if (!projectId) {
+    return NextResponse.json(
+      { error: "Project ID is required" },
+      { status: 400 },
+    );
+  }
+
+  if (!name) {
+    return NextResponse.json(
+      { error: "Channel name is required" },
+      { status: 400 },
+    );
+  }
+
+  const [created] = await db
+    .insert(channel)
+    .values({
+      projectId,
+      name,
+    })
+    .returning();
+
+  return NextResponse.json(created, { status: 201 });
+}

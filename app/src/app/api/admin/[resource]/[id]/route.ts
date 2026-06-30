@@ -1,8 +1,9 @@
 import { db } from "@/server/db";
 import { type NextRequest, NextResponse } from "next/server";
 import { resourceMap } from "../_resource";
-import { users } from "@/server/db/schema";
+import { channel } from "@/server/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { isProtectedChannelName } from "@/utils/adminResourceRules";
 
 export async function GET(
   request: NextRequest,
@@ -28,4 +29,42 @@ export async function GET(
   }
 
   return NextResponse.json({ error: "Unknown resouce" }, { status: 400 });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ resource: string; id: string }> },
+) {
+  const { resource, id } = await params;
+
+  if (resource !== "channel") {
+    return NextResponse.json(
+      { error: "Delete is not supported for this resource" },
+      { status: 405 },
+    );
+  }
+
+  const existing = await db.query.channel.findFirst({
+    where: eq(channel.id, id),
+  });
+
+  if (!existing) {
+    return NextResponse.json("not found", {
+      status: 404,
+    });
+  }
+
+  if (isProtectedChannelName(existing.name)) {
+    return NextResponse.json(
+      { error: "Default channels cannot be deleted" },
+      { status: 400 },
+    );
+  }
+
+  const [deleted] = await db
+    .delete(channel)
+    .where(eq(channel.id, id))
+    .returning();
+
+  return NextResponse.json(deleted);
 }
