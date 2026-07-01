@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.2](https://github.com/moonrailgun/iexpo/compare/v0.12.1...v0.12.2) (2026-07-01)
+
+### Bug Fixes
+
+* **admin:** persist project selection and update guide ([e722a5f](https://github.com/moonrailgun/iexpo/commit/e722a5f2bdffc4a296f5e433b0822b81d89dbca5))
+
 ## [0.12.1](https://github.com/moonrailgun/iexpo/compare/v0.12.0...v0.12.1) (2026-06-30)
 
 ### Bug Fixes
