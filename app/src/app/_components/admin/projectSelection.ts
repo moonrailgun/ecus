@@ -16,3 +16,16 @@ export function getNextProjectSelection(
     projectName: nextProject?.name ?? "",
   };
 }
+
+export function getProjectSelection(
+  projects: ProjectOption[],
+  selectedProjectId: string,
+) {
+  const selectedProject =
+    projects.find((project) => project.id === selectedProjectId) ?? projects[0];
+
+  return {
+    projectId: selectedProject?.id ?? "",
+    projectName: selectedProject?.name ?? "",
+  };
+}

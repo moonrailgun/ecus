@@ -5,17 +5,25 @@ import { IconPlus } from "tushan/icon";
 import { useAdminStore } from "./useAdminStore";
 import { openModal } from "./AdminGlobalModal";
 import { ProjectFormModal } from "./ProjectFormModal";
+import { getProjectSelection } from "./projectSelection";
 
 export const ProjectSwitcher: React.FC = React.memo(() => {
-  const { data: projects = [] } = api.project.list.useQuery();
+  const { data: projects = [], isFetched } = api.project.list.useQuery();
   const projectId = useAdminStore((state) => state.projectId);
+  const projectName = useAdminStore((state) => state.projectName);
 
-  useWatch([projectId, projects], () => {
-    if (projects.length > 0 && projects[0] && !projectId) {
-      useAdminStore.setState({
-        projectId: projects[0].id,
-        projectName: projects[0].name ?? "",
-      });
+  useWatch([isFetched, projectId, projectName, projects], () => {
+    if (!isFetched) {
+      return;
+    }
+
+    const nextSelection = getProjectSelection(projects, projectId);
+
+    if (
+      nextSelection.projectId !== projectId ||
+      nextSelection.projectName !== projectName
+    ) {
+      useAdminStore.setState(nextSelection);
     }
   });
 
