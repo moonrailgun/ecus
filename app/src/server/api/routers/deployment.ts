@@ -11,6 +11,8 @@ import {
 import { and, eq, sql } from "drizzle-orm";
 import { promoteDeployment, updateDeploymentMetadata } from "../deployment";
 import dayjs from "dayjs";
+import { logMemoryUsage } from "@/server/utils/memoryDiagnostics";
+import { randomUUID } from "crypto";
 
 // 定义日志记录类型
 interface AccessLogRecord {
@@ -92,10 +94,18 @@ export const deploymentRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const { projectId, startDate, endDate, timezone } = input;
+      const requestId = randomUUID();
 
       // Start timing
       const totalStartTime = performance.now();
       console.log(`[STATS_ACCESS] Starting statistics data query`);
+      logMemoryUsage("deployment.statsAccess.start", {
+        requestId,
+        projectId,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        timezone,
+      });
 
       // Step 1: Get the deduplicated client records within the specified date range
       const step1StartTime = performance.now();
@@ -122,6 +132,12 @@ export const deploymentRouter = createTRPCRouter({
       console.log(
         `[STATS_ACCESS] Step 1: Fetching deduplicated client records completed, duration: ${(performance.now() - step1StartTime).toFixed(2)}ms, fetched ${deduplicatedLogs.length} records`,
       );
+      logMemoryUsage("deployment.statsAccess.deduplicatedLogs", {
+        requestId,
+        projectId,
+        deduplicatedLogCount: deduplicatedLogs.length,
+        durationMs: Math.round(performance.now() - step1StartTime),
+      });
 
       if (deduplicatedLogs.length === 0) {
         console.log(
@@ -143,6 +159,11 @@ export const deploymentRouter = createTRPCRouter({
       console.log(
         `[STATS_ACCESS] Number of non-null updateIds after filtering: ${updateIds.length}`,
       );
+      logMemoryUsage("deployment.statsAccess.updateIds", {
+        requestId,
+        projectId,
+        updateIdCount: updateIds.length,
+      });
 
       const deploymentMapping: Record<string, string> = {};
 
@@ -259,6 +280,14 @@ export const deploymentRouter = createTRPCRouter({
       console.log(
         `[STATS_ACCESS] Statistics data query completed, total duration: ${(performance.now() - totalStartTime).toFixed(2)}ms`,
       );
+      logMemoryUsage("deployment.statsAccess.finish", {
+        requestId,
+        projectId,
+        deduplicatedLogCount: deduplicatedLogs.length,
+        updateIdCount: updateIds.length,
+        resultCount: result.length,
+        durationMs: Math.round(performance.now() - totalStartTime),
+      });
 
       return result;
     }),

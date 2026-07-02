@@ -6,6 +6,7 @@ import {
 } from "@/server/api/deployment";
 import { type gitInfoSchema } from "@/server/api/expo/schema";
 import { processZipFile } from "@/server/file/utils";
+import { logMemoryUsage } from "@/server/utils/memoryDiagnostics";
 import { NextResponse } from "next/server";
 import { type z } from "zod";
 
@@ -16,14 +17,40 @@ interface HandleZipFileProps {
   gitInfo: z.infer<typeof gitInfoSchema>;
   metadata: Record<string, unknown> | null;
   promoteChannelName: string | null;
+  requestId?: string;
+  source?: string;
 }
 
 export async function handleZipFile(props: HandleZipFileProps) {
-  const { file, projectId, userId, gitInfo, metadata, promoteChannelName } =
-    props;
+  const {
+    file,
+    projectId,
+    userId,
+    gitInfo,
+    metadata,
+    promoteChannelName,
+    requestId,
+    source,
+  } = props;
+  const startedAt = Date.now();
 
   try {
+    logMemoryUsage("upload.handleZip.start", {
+      requestId,
+      source,
+      projectId,
+      zipBytes: file.byteLength,
+    });
+
     const filelist = await processZipFile(file);
+
+    logMemoryUsage("upload.handleZip.extracted", {
+      requestId,
+      source,
+      projectId,
+      fileCount: filelist.length,
+      durationMs: Date.now() - startedAt,
+    });
 
     if (!filelist.some((f) => f.name === "metadata.json")) {
       return NextResponse.json(
@@ -39,12 +66,28 @@ export async function handleZipFile(props: HandleZipFileProps) {
       );
     }
 
+    logMemoryUsage("upload.handleZip.beforeUploadFiles", {
+      requestId,
+      source,
+      projectId,
+      fileCount: filelist.length,
+    });
+
     const { id, list, deployment } = await createDeploymentAndUploadFiles(
       projectId,
       userId,
       filelist,
       gitInfo,
     );
+
+    logMemoryUsage("upload.handleZip.filesUploaded", {
+      requestId,
+      source,
+      projectId,
+      deploymentId: id,
+      fileCount: list.length,
+      durationMs: Date.now() - startedAt,
+    });
 
     if (metadata) {
       await updateDeploymentMetadata(deployment.id, metadata, userId);
@@ -75,12 +118,29 @@ export async function handleZipFile(props: HandleZipFileProps) {
       }
     }
 
+    logMemoryUsage("upload.handleZip.finish", {
+      requestId,
+      source,
+      projectId,
+      deploymentId: id,
+      promoted: Boolean(promoteChannelName),
+      durationMs: Date.now() - startedAt,
+    });
+
     return NextResponse.json({
       id,
       list,
     });
   } catch (err) {
-    NextResponse.json(
+    logMemoryUsage("upload.handleZip.error", {
+      requestId,
+      source,
+      projectId,
+      durationMs: Date.now() - startedAt,
+      error: err instanceof Error ? err.message : String(err),
+    });
+
+    return NextResponse.json(
       { error: "handle zip file failed", detail: String(err) },
       { status: 500 },
     );
