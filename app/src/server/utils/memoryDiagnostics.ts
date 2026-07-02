@@ -29,8 +29,8 @@ function toMegabytes(bytes: number) {
 export function getMemoryUsageSnapshot(
   options: MemoryDiagnosticsOptions = {},
 ): MemoryUsageSnapshot {
-  const memoryUsage = options.memoryUsage ?? process.memoryUsage;
-  const uptime = options.uptime ?? process.uptime;
+  const memoryUsage = options.memoryUsage ?? (() => process.memoryUsage());
+  const uptime = options.uptime ?? (() => process.uptime());
   const usage = memoryUsage();
 
   return {
