@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.4](https://github.com/moonrailgun/iexpo/compare/v0.12.3...v0.12.4) (2026-07-02)
+
+### Bug Fixes
+
+* **app:** avoid unbound process methods ([0ee8fed](https://github.com/moonrailgun/iexpo/commit/0ee8fedf6b0acb58865ddd59993fa81af3fe94ee))
+
 ## [0.12.3](https://github.com/moonrailgun/iexpo/compare/v0.12.2...v0.12.3) (2026-07-02)
 
 ### Bug Fixes
