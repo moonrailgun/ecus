@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.12.3](https://github.com/moonrailgun/iexpo/compare/v0.12.2...v0.12.3) (2026-07-02)
+
+### Bug Fixes
+
+* **deps:** upgrade next to patched release ([86185e7](https://github.com/moonrailgun/iexpo/commit/86185e7f75877377f1beaba535a81d7c78147bf7))
+
+### Others
+
+* **server:** add memory diagnostics logging ([7fc97ef](https://github.com/moonrailgun/iexpo/commit/7fc97ef497a5b5293cbb2f5130be9bac0061e580))
+
 ## [0.12.2](https://github.com/moonrailgun/iexpo/compare/v0.12.1...v0.12.2) (2026-07-01)
 
 ### Bug Fixes
