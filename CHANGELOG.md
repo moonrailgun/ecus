@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.5](https://github.com/moonrailgun/iexpo/compare/v0.12.4...v0.12.5) (2026-09-11)
+
+### Bug Fixes
+
+* **auth:** configure GitHub OAuth issuer ([f3a94bb](https://github.com/moonrailgun/iexpo/commit/f3a94bbef3596c1232a996d679c18843f203b327))
+* **db:** encode access log cleanup timestamp ([6ccac9f](https://github.com/moonrailgun/iexpo/commit/6ccac9f86faf9fdb59ceee7f705499ffafb4f251))
+
 ## [0.12.4](https://github.com/moonrailgun/iexpo/compare/v0.12.3...v0.12.4) (2026-07-02)
 
 ### Bug Fixes
