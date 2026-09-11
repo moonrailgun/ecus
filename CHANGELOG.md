@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.13.0](https://github.com/moonrailgun/iexpo/compare/v0.12.5...v0.13.0) (2026-09-11)
+
+### Features
+
+* **home:** redesign landing page from OpenDesign ([0203f97](https://github.com/moonrailgun/iexpo/commit/0203f975cf415cfd56a5f32eb33ab92857cc5146))
+
 ## [0.12.5](https://github.com/moonrailgun/iexpo/compare/v0.12.4...v0.12.5) (2026-09-11)
 
 ### Bug Fixes
