@@ -1,5 +1,5 @@
 import { Cron } from "croner";
-import { sql } from "drizzle-orm";
+import { lt } from "drizzle-orm";
 import { db } from ".";
 import { accessLog } from "./schema";
 import { env } from "@/env";
@@ -21,7 +21,7 @@ async function cleanupAccessLogs() {
     // Build delete query, delete access logs earlier than the cutoff date
     const result = await db
       .delete(accessLog)
-      .where(sql`${accessLog.createdAt} < ${cutoffDate}`);
+      .where(lt(accessLog.createdAt, cutoffDate));
 
     console.log(
       `Successfully cleaned access logs: Deleted ${result.count ?? "unknown number of"} records older than ${RETENTION_DAYS} days`,
