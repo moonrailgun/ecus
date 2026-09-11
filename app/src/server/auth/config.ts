@@ -50,6 +50,7 @@ export const authConfig = {
      * @see https://next-auth.js.org/providers/github
      */
     GitHubProvider({
+      issuer: "https://github.com/login/oauth",
       clientId: env.AUTH_GITHUB_ID,
       clientSecret: env.AUTH_GITHUB_SECRET,
       authorization: {
