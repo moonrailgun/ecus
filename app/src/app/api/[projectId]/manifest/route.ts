@@ -58,6 +58,11 @@ export async function GET(
     );
   }
 
+  if (platform === "ios") {
+    // temp disabled
+    return await putNoUpdateAvailableInResponseAsync(request, protocolVersion);
+  }
+
   if (platform !== "ios" && platform !== "android") {
     return Response.json(
       {
